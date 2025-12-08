@@ -1,0 +1,39 @@
+{
+	"name": "rn-stylish",
+	"version": "1.0.0",
+	"description": "A flexible theming system for React Native with light/dark mode support",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"prepare": "npm run build"
+	},
+	"keywords": [
+		"react-native",
+		"theme",
+		"dark-mode",
+		"styling",
+		"jotai"
+	],
+	"author": "Your Name",
+	"license": "MIT",
+	"dependencies": {
+		"jotai": "^2.15.1"
+	},
+	"peerDependencies": {
+		"react": ">=16.8.0",
+		"react-native": ">=0.60.0"
+	},
+	"devDependencies": {
+		"@types/react": "^18.0.0",
+		"@types/react-native": "^0.72.0",
+		"typescript": "^5.0.0",
+		"react": "^18.0.0",
+		"react-native": "^0.72.0"
+	},
+	"files": [
+		"dist",
+		"src",
+		"README.md"
+	]
+}
