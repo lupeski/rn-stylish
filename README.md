@@ -1,47 +1,46 @@
-````markdown
 # rn-stylish
 
 A flexible theming system for React Native with light/dark mode support using Jotai.
 
 ## Installation
 
-```bash
+```
 npm install rn-stylish
 ```
-````
 
 ## Basic Usage
 
-```typescript
-import { createThemedStyles, useThemeSelect } from 'rn-stylish';
+```javascript
+import {Text, View} from 'react-native';
+import {createThemedStyles, useThemeSelect} from 'rn-stylish';
 
 // Create themed styles
-const useStyles = createThemedStyles((theme) => ({
-  container: {
-    backgroundColor: theme.themeColors.background,
-    flex: 1,
-  },
-  text: {
-    color: theme.themeColors.text,
-  },
+const useStyles = createThemedStyles(theme => ({
+	container: {
+		flex: 1,
+		backgroundColor: theme.themeColors.background,
+	},
+	text: {
+		color: theme.themeColors.text,
+	},
 }));
 
 // Use in component
 function MyComponent() {
-  const { styles, theme } = useStyles();
-  const { theme: themeMode, setTheme } = useThemeSelect();
+	const {styles, theme} = useStyles();
+	const {theme: themeMode, setTheme} = useThemeSelect();
 
-  return (
-
-      Hello World
-
-  );
+	return (
+		<View style={styles.container}>
+			<Text style={styles.text}>Welcome to rn-stylish!</Text>
+		</View>
+	);
 }
 ```
 
 ## Custom Themes
 
-```typescript
+```javascript
 import {useSetAtom} from 'jotai';
 import {lightThemeAtom, darkThemeAtom, Theme} from 'rn-stylish';
 
@@ -75,7 +74,3 @@ function App() {
 ## License
 
 MIT
-
-```
-
-```
