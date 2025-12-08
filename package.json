@@ -11,9 +11,11 @@
 	"keywords": [
 		"react-native",
 		"theme",
-		"dark-mode",
 		"styling",
-		"jotai"
+		"jotai",
+		"unistyles",
+		"styled-components",
+		"rn-stylish"
 	],
 	"author": "Your Name",
 	"license": "MIT",
