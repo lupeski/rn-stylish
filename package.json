@@ -35,5 +35,13 @@
 		"dist",
 		"src",
 		"README.md"
-	]
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lupeski/rn-stylish.git"
+	},
+	"bugs": {
+		"url": "https://github.com/lupeski/rn-stylish/issues"
+	},
+	"homepage": "https://github.com/lupeski/rn-stylish#readme"
 }
