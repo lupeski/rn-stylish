@@ -170,33 +170,35 @@ import {createThemedStyles} from 'rn-stylish';
 import {View, Text} from 'react-native';
 
 // TypeScript users get full autocomplete for theme.themeStyles and theme.staticStyles!
-const useStyles = createThemedStyles(theme => ({
-	container: {
-		backgroundColor: theme.themeStyles.background,
-		flex: 1,
-		padding: theme.themeStyles.padding,
-	},
-	text: {
-		color: theme.themeStyles.text,
-		fontSize: theme.themeStyles.fontSize,
-	},
-	card: {
-		backgroundColor: theme.themeStyles.cardBackground,
-		borderColor: theme.themeStyles.border,
-		borderWidth: 1,
-		borderRadius: theme.staticStyles.borderRadius,
-		padding: 16,
-	},
-	brandText: {
-		color: theme.staticStyles.brand,
-		fontWeight: 'bold',
-	},
-	successButton: {
-		backgroundColor: theme.staticStyles.success,
-		padding: 12,
-		borderRadius: theme.staticStyles.borderRadius,
-	},
-}));
+const useStyles = createThemedStyles((theme, props) => {
+	return {
+		container: {
+			backgroundColor: theme.themeStyles.background,
+			flex: 1,
+			padding: theme.themeStyles.padding,
+		},
+		text: {
+			color: theme.themeStyles.text,
+			fontSize: theme.themeStyles.fontSize,
+		},
+		card: {
+			backgroundColor: theme.themeStyles.cardBackground,
+			borderColor: theme.themeStyles.border,
+			borderWidth: 1,
+			borderRadius: theme.staticStyles.borderRadius,
+			padding: 16,
+		},
+		brandText: {
+			color: theme.staticStyles.brand,
+			fontWeight: 'bold',
+		},
+		successButton: {
+			backgroundColor: theme.staticStyles.success,
+			padding: 12,
+			borderRadius: theme.staticStyles.borderRadius,
+		},
+	};
+});
 
 // Use in your component
 function MyComponent() {
@@ -286,18 +288,20 @@ Pass dynamic values to your styles:
 ```typescript
 import {useHeaderHeight} from '@react-navigation/elements';
 
-const useStyles = createThemedStyles((theme, props) => ({
-	container: {
-		paddingTop: props.headerHeight + 15,
-		paddingHorizontal: theme.themeStyles.padding,
-		gap: 15,
-		backgroundColor: theme.themeStyles.background,
-	},
-	title: {
-		color: theme.themeStyles.text,
-		fontSize: theme.themeStyles.fontSize,
-	},
-}));
+const useStyles = createThemedStyles((theme, props) => {
+	return {
+		container: {
+			paddingTop: props.headerHeight + 15,
+			paddingHorizontal: theme.themeStyles.padding,
+			gap: 15,
+			backgroundColor: theme.themeStyles.background,
+		},
+		title: {
+			color: theme.themeStyles.text,
+			fontSize: theme.themeStyles.fontSize,
+		},
+	};
+});
 
 function EmailValidation() {
 	const headerHeight = useHeaderHeight();
@@ -316,24 +320,26 @@ function EmailValidation() {
 Use `getDynamicStyles` when you need to compute styles multiple times with different values (like in lists):
 
 ```typescript
-const useStyles = createThemedStyles((theme, props) => ({
-	container: {
-		flex: 1,
-		backgroundColor: theme.themeStyles.background,
-		justifyContent: 'center',
-		gap: 12,
-	},
-	item: {
-		padding: 16,
-		borderRadius: theme.staticStyles.borderRadius,
-		backgroundColor: props.isSelected
-			? theme.staticStyles.success
-			: theme.themeStyles.cardBackground,
-	},
-	itemText: {
-		color: props.isSelected ? '#FFFFFF' : theme.themeStyles.text,
-	},
-}));
+const useStyles = createThemedStyles((theme, props) => {
+	return {
+		container: {
+			flex: 1,
+			backgroundColor: theme.themeStyles.background,
+			justifyContent: 'center',
+			gap: 12,
+		},
+		item: {
+			padding: 16,
+			borderRadius: theme.staticStyles.borderRadius,
+			backgroundColor: props.isSelected
+				? theme.staticStyles.success
+				: theme.themeStyles.cardBackground,
+		},
+		itemText: {
+			color: props.isSelected ? '#FFFFFF' : theme.themeStyles.text,
+		},
+	};
+});
 
 function ItemList({items}) {
 	const {styles, getDynamicStyles} = useStyles();
@@ -367,11 +373,13 @@ function ItemList({items}) {
 Sometimes you need theme values outside of styles:
 
 ```typescript
-const useStyles = createThemedStyles(theme => ({
-	container: {
-		backgroundColor: theme.themeStyles.background,
-	},
-}));
+const useStyles = createThemedStyles((theme, props) => {
+	return {
+		container: {
+			backgroundColor: theme.themeStyles.background,
+		},
+	};
+});
 
 function MyComponent() {
 	const {styles, theme} = useStyles();
