@@ -15,16 +15,23 @@ export interface Theme<
 	staticStyles: StaticStylesType;
 }
 
-// Configuration options
-export interface ThemeConfig<
+// Configuration options - support both dual-theme and single-theme modes
+export type ThemeConfig<
 	ThemeStylesType extends Record<string, any> = Record<string, any>,
 	StaticStylesType extends Record<string, any> = Record<string, any>
-> {
-	lightThemeStyles: ThemeStylesType;
-	darkThemeStyles: ThemeStylesType;
-	staticStyles: StaticStylesType;
-	initialMode?: 'light' | 'dark' | 'system';
-}
+> =
+	| {
+			// Dual-theme mode (light/dark switching)
+			lightThemeStyles: ThemeStylesType;
+			darkThemeStyles: ThemeStylesType;
+			staticStyles: StaticStylesType;
+			initialMode?: 'light' | 'dark' | 'system';
+	  }
+	| {
+			// Single-theme mode (no light/dark switching)
+			staticStyles: StaticStylesType;
+			initialMode?: never;
+	  };
 
 // Return type for the hook
 export interface ThemedStylesHook<

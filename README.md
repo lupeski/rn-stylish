@@ -4,12 +4,13 @@ A flexible and type-safe theming system for React Native with automatic light/da
 
 ## Features
 
-- 🎨 **Automatic theme switching** - Light, dark, and system modes
+- 🎨 **Automatic theme switching** - Light, dark, and system modes with persistent storage
 - 💪 **Type-safe** - Full TypeScript support with autocomplete
 - 🎯 **Simple API** - Easy to use hooks and utilities
 - ⚡ **Performance** - Memoized styles with efficient re-renders
 - 🎭 **Fully customizable** - Define your own theme structure and styles
 - 🔄 **Flexible styling** - Support for colors, font sizes, padding, margins, and any style values
+- 💾 **Persistent preferences** - Theme mode saved automatically across app sessions
 - 📦 **Lightweight** - Minimal dependencies (just Jotai for state)
 
 ## Installation
@@ -53,13 +54,9 @@ Then in your App:
 ```javascript
 // App.tsx / App.js or wherever your app's entry point is
 import {configureTheme} from 'rn-stylish';
-import {
-	lightThemeStyles,
-	darkThemeStyles,
-	staticStyles,
-} from '../../styling/themes';
+import {lightThemeStyles, darkThemeStyles, staticStyles} from './themes';
 
-export const {createThemedStyles} = configureTheme({
+export const {createThemedStyles, useThemeControl} = configureTheme({
 	lightThemeStyles,
 	darkThemeStyles,
 	staticStyles,
@@ -84,27 +81,13 @@ const useStyles = createThemedStyles((theme, props) => {
 		container: {
 			backgroundColor: theme.themeStyles.background,
 			flex: 1,
-			padding: theme.themeStyles.padding,
 		},
 		text: {
 			color: theme.themeStyles.text,
-			fontSize: theme.themeStyles.fontSize,
-		},
-		card: {
-			backgroundColor: theme.themeStyles.cardBackground,
-			borderColor: theme.themeStyles.border,
-			borderWidth: 1,
-			borderRadius: theme.staticStyles.borderRadius,
-			padding: 16,
 		},
 		brandText: {
 			color: theme.staticStyles.brand,
 			fontWeight: 'bold',
-		},
-		successButton: {
-			backgroundColor: theme.staticStyles.success,
-			padding: 12,
-			borderRadius: theme.staticStyles.borderRadius,
 		},
 	};
 });
@@ -115,10 +98,8 @@ function MyComponent() {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.card}>
-				<Text style={styles.text}>This text color changes with theme</Text>
-				<Text style={styles.brandText}>This stays your brand color</Text>
-			</View>
+			<Text style={styles.text}>This text color changes with theme</Text>
+			<Text style={styles.brandText}>This stays your brand color</Text>
 		</View>
 	);
 }
@@ -127,10 +108,10 @@ function MyComponent() {
 ### 3. Theme Switching
 
 ```javascript
-import {useThemeSelect} from 'rn-stylish';
+import {useThemeControl} from './App'; // Import from where you configured your theme
 
 function ThemeToggle() {
-	const {theme, setTheme} = useThemeSelect();
+	const {theme, setTheme} = useThemeControl();
 
 	return (
 		<View>
@@ -140,27 +121,6 @@ function ThemeToggle() {
 			<Text>Current: {theme}</Text>
 		</View>
 	);
-}
-```
-
-### 4. Single Theme Mode (No Light/Dark Switching)
-
-If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
-
-```javascript
-const staticStyles = {
-	background: '#FFFFFF',
-	text: '#000000',
-	linkText: '#007AFF',
-};
-
-export const {createThemedStyles} = configureTheme({
-	staticStyles,
-	initialMode: 'system',
-});
-
-function App() {
-	return <YourApp />;
 }
 ```
 
@@ -176,14 +136,14 @@ import {useHeaderHeight} from '@react-navigation/elements';
 const useStyles = createThemedStyles((theme, props) => {
 	return {
 		container: {
-			paddingTop: props.headerHeight + 15, // headerHeight is passed to the useStyles hook
-			paddingHorizontal: theme.themeStyles.padding,
+			paddingTop: props.headerHeight + 15,
+			paddingHorizontal: 16,
 			gap: 15,
 			backgroundColor: theme.themeStyles.background,
 		},
 		title: {
 			color: theme.themeStyles.text,
-			fontSize: theme.themeStyles.fontSize,
+			fontSize: 24,
 		},
 	};
 });
@@ -217,7 +177,7 @@ const useStyles = createThemedStyles((theme, props) => {
 		},
 		item: {
 			padding: 16,
-			borderRadius: theme.staticStyles.borderRadius,
+			borderRadius: 8,
 			backgroundColor: props.isSelected
 				? theme.staticStyles.success
 				: theme.themeStyles.cardBackground,
@@ -292,11 +252,17 @@ function MyComponent() {
 
 ### `configureTheme(config)`
 
-Creates a "createThemedStyles" function that returns the useStyles hook
+Creates a `createThemedStyles` function and `useThemeControl` hook configured with your theme definitions.
 
 **Parameters**
 
-- `config: ThemeConfig` - `ThemeConfig : {lightThemeStyles: ThemeStylesType, darkThemeStyles: ThemeStylesType, staticStyles: StaticStylesType, initialMode: "light" | "dark" | "system"}`
+- `config: ThemeConfig`
+  - `lightThemeStyles: ThemeStylesType` - Styles for light mode
+  - `darkThemeStyles: ThemeStylesType` - Styles for dark mode
+  - `staticStyles: StaticStylesType` - Styles that don't change with theme
+  - `initialMode?: 'light' | 'dark' | 'system'` - Initial theme mode (default: 'system'). Only used on first app launch; subsequent launches load from storage.
+
+**Returns:** `{ createThemedStyles, useThemeControl }`
 
 ### `createThemedStyles(stylesFn)`
 
@@ -310,11 +276,51 @@ Creates a hook that returns themed styles.
 
 - `styles` - StyleSheet object with all your styles
 - `getDynamicStyles(props)` - Function to generate styles with different props at runtime
-- `theme` - Current active theme object
+- `theme` - Current active theme object with `themeStyles` and `staticStyles`
 
-### `useThemeSelect()`
+### 4. Single Theme Mode (No Light/Dark Switching)
 
-Hook for managing theme mode.
+If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
+
+```javascript
+import {configureTheme} from 'rn-stylish';
+
+const staticStyles = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#007AFF',
+	brand: 'dodgerblue',
+	success: '#008521',
+};
+
+export const {createThemedStyles, useThemeControl} = configureTheme({
+	staticStyles,
+});
+
+function App() {
+	return <YourApp />;
+}
+```
+
+In single-theme mode, access styles directly from `theme.staticStyles`:
+
+```javascript
+const useStyles = createThemedStyles(theme => ({
+	container: {
+		backgroundColor: theme.staticStyles.background,
+		flex: 1,
+	},
+	text: {
+		color: theme.staticStyles.text,
+	},
+}));
+```
+
+### `useThemeControl()`
+
+Hook for managing theme mode. Theme preference is automatically persisted to storage. **This hook is returned from `configureTheme()` and must be imported from where you configured your theme**, not from the rn-stylish package directly.
+
+**Note:** This hook is only useful when you've configured light and dark themes. In single-theme mode, theme switching has no effect.
 
 **Returns:**
 
@@ -324,6 +330,8 @@ Hook for managing theme mode.
 ### Types
 
 ```typescript
+type ThemeMode = 'light' | 'dark' | 'system';
+
 interface Theme<
 	ThemeStylesType extends Record<string, any> = Record<string, any>,
 	StaticStylesType extends Record<string, any> = Record<string, any>
@@ -339,7 +347,7 @@ interface ThemeConfig<
 	lightThemeStyles: ThemeStylesType;
 	darkThemeStyles: ThemeStylesType;
 	staticStyles: StaticStylesType;
-	initialMode?: 'light' | 'dark' | 'system';
+	initialMode?: ThemeMode;
 }
 
 interface ThemedStylesHook<
@@ -351,6 +359,10 @@ interface ThemedStylesHook<
 	getDynamicStyles: (dynamicProps: any) => Styles;
 	theme: Theme<ThemeStylesType, StaticStylesType>;
 }
+
+type RNStyle = ViewStyle | TextStyle | ImageStyle;
+
+type NamedStyles<T> = {[P in keyof T]: RNStyle};
 ```
 
 ## Default Themes
@@ -361,10 +373,11 @@ See the "Configure Your Themes" section above for examples.
 
 ## Best Practices
 
-1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders, padding/margins that change with theme)
-2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius, max widths)
-3. **Set custom themes at app startup** - Call configureTheme to set up your light/dark/static themes.
+1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders)
+2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius)
+3. **Set custom themes at app startup** - Call `configureTheme` once in your app's entry point
 4. **Think beyond colors** - Include fontSize, padding, margin, borderRadius, shadows, etc.
+5. **Theme preferences persist automatically** - User's theme choice is saved and restored on app restart
 
 ### Example: What goes where?
 
@@ -375,8 +388,6 @@ lightThemeStyles: {
   text: '#000000',
   cardBackground: '#F5F5F5',
   border: '#E0E0E0',
-  padding: 16,
-  fontSize: 16,
 }
 
 darkThemeStyles: {
@@ -384,8 +395,6 @@ darkThemeStyles: {
   text: '#FFFFFF',
   cardBackground: '#1C1C1E',
   border: '#3A3A3C',
-  padding: 16,
-  fontSize: 16,
 }
 
 // Static styles - these STAY THE SAME in both themes
@@ -403,45 +412,44 @@ staticStyles: {
 ## Example: Complete App Setup
 
 ```typescript
-// App.tsx
-import React, {useEffect} from 'react';
-import {SafeAreaView} from 'react-native';
-import {useThemeSelect, createThemedStyles} from 'rn-stylish';
-
-// Define your theme styles
-const lightThemeStyles = {
+// themes.ts
+export const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
-	linkText: '#0000EE',
+	cardBackground: '#F5F5F5',
 };
 
-const darkThemeStyles = {
+export const darkThemeStyles = {
 	background: '#1C1C1E',
 	text: '#FFFFFF',
-	linkText: '#ADD8E6',
+	cardBackground: '#2C2C2E',
 };
 
-const staticStyles = {
+export const staticStyles = {
 	brand: 'dodgerblue',
 	success: '#008521',
 	error: '#FF3B30',
 };
 
-export const {createThemedStyles} = configureTheme({
+// App.tsx
+import React from 'react';
+import {SafeAreaView} from 'react-native';
+import {configureTheme} from 'rn-stylish';
+import {lightThemeStyles, darkThemeStyles, staticStyles} from './themes';
+
+export const {createThemedStyles, useThemeControl} = configureTheme({
 	lightThemeStyles,
 	darkThemeStyles,
 	staticStyles,
 	initialMode: 'system',
 });
 
-const useStyles = createThemedStyles((theme, props) => {
-	return {
-		container: {
-			flex: 1,
-			backgroundColor: theme.themeStyles.background,
-		},
-	};
-});
+const useStyles = createThemedStyles(theme => ({
+	container: {
+		flex: 1,
+		backgroundColor: theme.themeStyles.background,
+	},
+}));
 
 function App() {
 	const {styles} = useStyles();
@@ -466,4 +474,4 @@ MIT
 
 ## Credits
 
-Using [Jotai](https://jotai.org/) for state management.
+Using [Jotai](https://jotai.org/) for state management and persistent storage.
