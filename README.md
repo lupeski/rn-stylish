@@ -26,7 +26,7 @@ rn-stylish requires you to define your own theme styles. Set them up in your app
 
 #### Setup
 
-Create a `themes.ts` or `themes.ts` file to define your themes:
+Create a `themes.ts` or `themes.js` file to define your themes:
 
 ```javascript
 export const lightThemeStyles = {
