@@ -30,32 +30,9 @@ Create a `theme.ts` file to define your themes with full type safety:
 
 ```typescript
 // theme.ts
-import {ThemeStyles, StaticStyles} from 'rn-stylish';
 
-// Define your theme structure with autocomplete
-export interface MyThemeStyles extends ThemeStyles {
-	background: string;
-	text: string;
-	linkText: string;
-	cardBackground: string;
-	border: string;
-	placeholder: string;
-	fontSize: number;
-	spacing: number;
-}
-
-export interface MyStaticStyles extends StaticStyles {
-	brand: string;
-	success: string;
-	error: string;
-	warning: string;
-	info: string;
-	borderRadius: number;
-	maxWidth: number;
-}
-
-// Light theme
-export const lightThemeStyles: MyThemeStyles = {
+// Define your light theme styles
+const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
 	linkText: '#007AFF',
@@ -66,8 +43,8 @@ export const lightThemeStyles: MyThemeStyles = {
 	spacing: 16,
 };
 
-// Dark theme
-export const darkThemeStyles: MyThemeStyles = {
+// Define your dark theme styles
+const darkThemeStyles = {
 	background: '#000000',
 	text: '#FFFFFF',
 	linkText: '#66B2FF',
@@ -78,8 +55,8 @@ export const darkThemeStyles: MyThemeStyles = {
 	spacing: 16,
 };
 
-// Static styles
-export const staticStyles: MyStaticStyles = {
+// Define your static styles (same in both themes)
+const staticStyles = {
 	brand: '#007AFF',
 	success: '#28A745',
 	error: '#DC3545',
@@ -88,6 +65,13 @@ export const staticStyles: MyStaticStyles = {
 	borderRadius: 8,
 	maxWidth: 1200,
 };
+
+// Export types using typeof for autocomplete
+export type MyThemeStyles = typeof lightThemeStyles;
+export type MyStaticStyles = typeof staticStyles;
+
+// Export the actual theme objects
+export {lightThemeStyles, darkThemeStyles, staticStyles};
 ```
 
 Then in your App:
