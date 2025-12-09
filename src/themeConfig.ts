@@ -2,7 +2,7 @@ import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
 import {useAtom, useAtomValue} from 'jotai';
-import {createThemeModeAtom, type ThemeMode} from './themeAtom';
+import {createThemeModeAtom} from './themeAtom';
 
 export function configureTheme<
 	ThemeStylesType extends Record<string, any>,
