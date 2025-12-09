@@ -7,22 +7,32 @@ export type RNStyle = ViewStyle | TextStyle | ImageStyle;
 export type NamedStyles<T> = {[P in keyof T]: RNStyle};
 
 // Generic Theme interface - developers will extend this with their own theme structure
-export interface Theme {
-	themeStyles: Record<string, any>;
-	staticStyles?: Record<string, any>;
-	[key: string]: any; // Allow any additional properties
-}
-
-// Return type for the hook
-export interface ThemedStylesHook<Styles, ThemeType extends Theme> {
-	styles: Styles;
-	getDynamicStyles: (dynamicProps: any) => Styles;
-	theme: ThemeType;
+export interface Theme<
+	ThemeStylesType extends Record<string, any> = Record<string, any>,
+	StaticStylesType extends Record<string, any> = Record<string, any>
+> {
+	themeStyles: ThemeStylesType;
+	staticStyles: StaticStylesType;
 }
 
 // Configuration options
-export interface ThemeConfig<ThemeType extends Theme = Theme> {
-	lightTheme: ThemeType;
-	darkTheme: ThemeType;
+export interface ThemeConfig<
+	ThemeStylesType extends Record<string, any> = Record<string, any>,
+	StaticStylesType extends Record<string, any> = Record<string, any>
+> {
+	lightThemeStyles: ThemeStylesType;
+	darkThemeStyles: ThemeStylesType;
+	staticStyles: StaticStylesType;
 	initialMode?: 'light' | 'dark' | 'system';
+}
+
+// Return type for the hook
+export interface ThemedStylesHook<
+	Styles,
+	ThemeStylesType extends Record<string, any>,
+	StaticStylesType extends Record<string, any>
+> {
+	styles: Styles;
+	getDynamicStyles: (dynamicProps: any) => Styles;
+	theme: Theme<ThemeStylesType, StaticStylesType>;
 }
