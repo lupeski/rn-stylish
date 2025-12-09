@@ -1,10 +1,5 @@
-export interface ThemeStyles {
-	[key: string]: any;
-}
-
-export interface StaticStyles {
-	[key: string]: any;
-}
+export type ThemeStyles = Record<string, any>;
+export type StaticStyles = Record<string, any>;
 
 export interface Theme<
 	TThemeStyles extends ThemeStyles = ThemeStyles,
