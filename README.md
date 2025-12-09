@@ -204,7 +204,7 @@ function EmailValidation() {
 
 Use `getDynamicStyles` when you need to compute styles inline with different values (like in lists):
 
-**NOTE**: If extracting a list item into a full react component, you can simply use the useStyles hook. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
+**NOTE**: If extracting a list item into a full react component, you can simply use the useStyles hook in that component. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
 
 ```javascript
 const useStyles = createThemedStyles((theme, props) => {
