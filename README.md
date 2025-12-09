@@ -8,8 +8,8 @@ A flexible and type-safe theming system for React Native with automatic light/da
 - 💪 **Type-safe** - Full TypeScript support with autocomplete
 - 🎯 **Simple API** - Easy to use hooks and utilities
 - ⚡ **Performance** - Memoized styles with efficient re-renders
-- 🎭 **Customizable** - Override default themes with your own colors
-- 🎨 **Theme & Static Colors** - Colors that change with theme + colors that stay consistent
+- 🎭 **Fully customizable** - Define your own theme structure and styles
+- 🔄 **Flexible styling** - Support for colors, sizes, spacing, and any style values
 - 📦 **Lightweight** - Minimal dependencies (just Jotai for state)
 
 ## Installation
@@ -188,9 +188,9 @@ import {View, Text} from 'react-native';
 // TypeScript users get full autocomplete for theme.themeStyles and theme.staticStyles!
 const useStyles = createThemedStyles(theme => ({
 	container: {
-		backgroundColor: theme.themeStyles.background, // autocomplete shows: background, text, linkText, cardBackground, fontSize, spacing, etc.
+		backgroundColor: theme.themeStyles.background,
 		flex: 1,
-		padding: theme.themeStyles.spacing, // Non-color values work too!
+		padding: theme.themeStyles.spacing,
 	},
 	text: {
 		color: theme.themeStyles.text,
@@ -200,11 +200,11 @@ const useStyles = createThemedStyles(theme => ({
 		backgroundColor: theme.themeStyles.cardBackground,
 		borderColor: theme.themeStyles.border,
 		borderWidth: 1,
-		borderRadius: theme.staticStyles.borderRadius, // Static styles here
+		borderRadius: theme.staticStyles.borderRadius,
 		padding: 16,
 	},
 	brandText: {
-		color: theme.staticStyles.brand, // autocomplete shows: brand, success, error, warning, info, borderRadius, maxWidth
+		color: theme.staticStyles.brand,
 		fontWeight: 'bold',
 	},
 	successButton: {
@@ -248,85 +248,7 @@ function ThemeToggle() {
 }
 ```
 
-```typescript
-import {useThemeSelect} from 'rn-stylish';
-
-function ThemeToggle() {
-	const {themeMode, setThemeMode} = useThemeSelect();
-
-	return (
-		<View>
-			<Button title="Light" onPress={() => setThemeMode('light')} />
-			<Button title="Dark" onPress={() => setThemeMode('dark')} />
-			<Button title="System" onPress={() => setThemeMode('system')} />
-			<Text>Current: {themeMode}</Text>
-		</View>
-	);
-}
-```
-
 ## Advanced Usage
-
-### Custom Themes
-
-Define your own color schemes. Remember:
-
-- **`themeColors`** - Change when switching between light/dark mode
-- **`staticColors`** - Stay the same regardless of theme mode (brand colors, success/error states, etc.)
-
-```typescript
-import {useThemeSelect, Theme} from 'rn-stylish';
-import {useEffect} from 'react';
-
-// Define theme-aware colors separately
-const lightThemeColors = {
-	background: '#F5F5F5', // Light background
-	text: '#333333', // Dark text for light mode
-	linkText: '#007AFF',
-	primary: '#FF6B6B',
-	secondary: '#4ECDC4',
-};
-
-const darkThemeColors = {
-	background: '#1A1A1A', // Dark background
-	text: '#FFFFFF', // Light text for dark mode
-	linkText: '#66B2FF',
-	primary: '#FF8787',
-	secondary: '#63E6E1',
-};
-
-// Define static colors once - shared by both themes
-const staticColors = {
-	brand: '#FF6B6B', // Your brand color - same in both themes
-	white: '#FFFFFF',
-	black: '#000000',
-	success: '#51CF66', // Success green - same in both themes
-	error: '#FF6B6B', // Error red - same in both themes
-	warning: '#FFD93D',
-};
-
-// Compose the theme objects
-const myLightTheme: Theme = {
-	themeColors: lightThemeColors,
-	staticColors,
-};
-
-const myDarkTheme: Theme = {
-	themeColors: darkThemeColors,
-	staticColors, // Same static colors
-};
-
-function App() {
-	const {setLightTheme, setDarkTheme} = useThemeSelect();
-
-	useEffect(() => {
-		setLightTheme(myLightTheme);
-		setDarkTheme(myDarkTheme);
-	}, []);
-
-	return <YourApp />;
-}
-```
 
 ### Styles with Props
 
@@ -338,7 +260,7 @@ import {useHeaderHeight} from '@react-navigation/elements';
 const useStyles = createThemedStyles((theme, props) => ({
 	container: {
 		paddingTop: props.headerHeight + 15,
-		paddingHorizontal: theme.themeStyles.spacing, // Use theme values with props!
+		paddingHorizontal: theme.themeStyles.spacing,
 		gap: 15,
 		backgroundColor: theme.themeStyles.background,
 	},
@@ -368,19 +290,19 @@ Use `getDynamicStyles` when you need to compute styles multiple times with diffe
 const useStyles = createThemedStyles((theme, props) => ({
 	container: {
 		flex: 1,
-		backgroundColor: theme.themeColors.background,
+		backgroundColor: theme.themeStyles.background,
 		justifyContent: 'center',
 		gap: 12,
 	},
 	item: {
 		padding: 16,
-		borderRadius: 8,
+		borderRadius: theme.staticStyles.borderRadius,
 		backgroundColor: props.isSelected
-			? theme.staticColors.green
-			: theme.staticColors.gray,
+			? theme.staticStyles.success
+			: theme.themeStyles.cardBackground,
 	},
 	itemText: {
-		color: props.isSelected ? theme.staticColors.white : theme.themeColors.text,
+		color: props.isSelected ? '#FFFFFF' : theme.themeStyles.text,
 	},
 }));
 
@@ -514,7 +436,7 @@ lightThemeStyles: {
   text: '#000000',
   cardBackground: '#F5F5F5',
   border: '#E0E0E0',
-  spacing: 16,           // Can include numbers!
+  spacing: 16,
   fontSize: 16,
 }
 
@@ -523,17 +445,17 @@ darkThemeStyles: {
   text: '#FFFFFF',
   cardBackground: '#1C1C1E',
   border: '#3A3A3C',
-  spacing: 16,           // Same spacing, but could be different
+  spacing: 16,
   fontSize: 16,
 }
 
 // Static styles - these STAY THE SAME in both themes
 staticStyles: {
-  brand: '#FF6B6B',      // Your brand color
-  success: '#51CF66',    // Success state - always green
-  error: '#FF3B30',      // Error state - always red
-  warning: '#FFD93D',    // Warning state - always yellow
-  borderRadius: 8,       // Design system constants
+  brand: '#FF6B6B',
+  success: '#51CF66',
+  error: '#FF3B30',
+  warning: '#FFD93D',
+  borderRadius: 8,
   maxWidth: 1200,
   headerHeight: 60,
 }
