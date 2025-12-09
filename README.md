@@ -556,4 +556,4 @@ MIT
 
 ## Credits
 
-Built with ❤️ using [Jotai](https://jotai.org/) for state management.
+Using [Jotai](https://jotai.org/) for state management.
