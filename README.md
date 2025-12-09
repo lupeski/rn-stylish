@@ -20,153 +20,65 @@ npm install rn-stylish
 
 ## Quick Start
 
-### 1. Configure Your Themes (Required!)
+### 1. Configure Your Themes
 
 rn-stylish requires you to define your own theme styles. Set them up in your app's entry point before using any themed components.
 
-#### TypeScript Setup (Recommended - with autocomplete!)
+#### Setup
 
-Create a `theme.ts` file to define your themes with full type safety:
-
-```typescript
-// theme.ts
-
-// Define your light theme styles
-const lightThemeStyles = {
-	background: '#FFFFFF',
-	text: '#000000',
-	linkText: '#007AFF',
-	cardBackground: '#F8F9FA',
-	border: '#DEE2E6',
-	placeholder: '#6C757D',
-	fontSize: 16,
-	padding: 16,
-} as const;
-
-// Define your dark theme styles
-const darkThemeStyles = {
-	background: '#000000',
-	text: '#FFFFFF',
-	linkText: '#66B2FF',
-	cardBackground: '#1C1C1C',
-	border: '#343A40',
-	placeholder: '#ADB5BD',
-	fontSize: 16,
-	padding: 16,
-} as const;
-
-// Define your static styles (same in both themes)
-const staticStyles = {
-	brand: '#007AFF',
-	success: '#28A745',
-	error: '#DC3545',
-	warning: '#FFC107',
-	info: '#17A2B8',
-	borderRadius: 8,
-	maxWidth: 1200,
-} as const;
-
-// Export types using typeof for autocomplete
-export type AppThemeStyles = typeof lightThemeStyles;
-export type AppStaticStyles = typeof staticStyles;
-```
-
-Then in your App:
-
-```typescript
-// App.tsx
-import {useEffect} from 'react';
-import {useThemeSelect} from 'rn-stylish';
-import {lightThemeStyles, darkThemeStyles, staticStyles} from './theme';
-
-function App() {
-	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
-		useThemeSelect();
-
-	useEffect(() => {
-		setLightThemeStyles(lightThemeStyles);
-		setDarkThemeStyles(darkThemeStyles);
-		setStaticStyles(staticStyles);
-	}, []);
-
-	return <YourApp />;
-}
-```
-
-Now when you use themes, you'll get autocomplete for all your custom properties!
-
-#### JavaScript Setup
-
-If you're not using TypeScript, create a `theme.js` file:
+Create a `themes.ts` or `themes.ts` file to define your themes:
 
 ```javascript
-// theme.js
-
-// Light theme
 export const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
-	linkText: '#007AFF',
-	cardBackground: '#F8F9FA',
-	border: '#DEE2E6',
-	placeholder: '#6C757D',
-	fontSize: 16,
-	padding: 16,
+	linkText: '#0000EE',
 };
 
-// Dark theme
 export const darkThemeStyles = {
-	background: '#000000',
+	background: '#1C1C1E',
 	text: '#FFFFFF',
-	linkText: '#66B2FF',
-	cardBackground: '#1C1C1C',
-	border: '#343A40',
-	placeholder: '#ADB5BD',
-	fontSize: 16,
-	padding: 16,
+	linkText: '#ADD8E6',
 };
 
-// Static styles
 export const staticStyles = {
-	brand: '#007AFF',
-	success: '#28A745',
-	error: '#DC3545',
-	warning: '#FFC107',
-	info: '#17A2B8',
-	borderRadius: 8,
-	maxWidth: 1200,
+	brand: 'dodgerblue',
+	success: '#008521',
+	error: '#FF3B30',
 };
 ```
 
 Then in your App:
 
 ```javascript
-// App.js
-import {useEffect} from 'react';
-import {useThemeSelect} from 'rn-stylish';
-import {lightThemeStyles, darkThemeStyles, staticStyles} from './theme';
+// App.tsx / App.js or wherever your app's entry point is
+import {configureTheme} from 'rn-stylish';
+import {
+	lightThemeStyles,
+	darkThemeStyles,
+	staticStyles,
+} from '../../styling/themes';
+
+export const {createThemedStyles} = configureTheme({
+	lightThemeStyles,
+	darkThemeStyles,
+	staticStyles,
+	initialMode: 'system',
+});
 
 function App() {
-	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
-		useThemeSelect();
-
-	useEffect(() => {
-		setLightThemeStyles(lightThemeStyles);
-		setDarkThemeStyles(darkThemeStyles);
-		setStaticStyles(staticStyles);
-	}, []);
-
 	return <YourApp />;
 }
 ```
 
+Now when you use themes, you'll get autocomplete for all your custom properties.
+
 ### 2. Create Themed Styles
 
-```typescript
-import {createThemedStyles} from 'rn-stylish';
+```javascript
 import {View, Text} from 'react-native';
+import {createThemedStyles} from './App.js';
 
-// TypeScript users get full autocomplete for theme.themeStyles and theme.staticStyles!
 const useStyles = createThemedStyles((theme, props) => {
 	return {
 		container: {
@@ -214,18 +126,18 @@ function MyComponent() {
 
 ### 3. Theme Switching
 
-```typescript
+```javascript
 import {useThemeSelect} from 'rn-stylish';
 
 function ThemeToggle() {
-	const {themeMode, setThemeMode} = useThemeSelect();
+	const {theme, setTheme} = useThemeSelect();
 
 	return (
 		<View>
-			<Button title="Light" onPress={() => setThemeMode('light')} />
-			<Button title="Dark" onPress={() => setThemeMode('dark')} />
-			<Button title="System" onPress={() => setThemeMode('system')} />
-			<Text>Current: {themeMode}</Text>
+			<Button title="Light" onPress={() => setTheme('light')} />
+			<Button title="Dark" onPress={() => setTheme('dark')} />
+			<Button title="System" onPress={() => setTheme('system')} />
+			<Text>Current: {theme}</Text>
 		</View>
 	);
 }
@@ -233,12 +145,12 @@ function ThemeToggle() {
 
 ### 4. Single Theme Mode (No Light/Dark Switching)
 
-If your app doesn't need theme switching, you can use a single theme:
+If your app doesn't need theme switching, you simply omit light and dark themes, and just use staticStyles:
 
-**Option 1: Set both themes to the same values**
+**Set both themes to the same values**
 
-```typescript
-const myTheme = {
+```javascript
+const staticStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
 	linkText: '#007AFF',
@@ -249,27 +161,8 @@ function App() {
 		useThemeSelect();
 
 	useEffect(() => {
-		// Use the same theme for both light and dark
-		setLightThemeStyles(myTheme);
-		setDarkThemeStyles(myTheme);
+		// Just set static styles
 		setStaticStyles(staticStyles);
-		// Theme mode will default to 'system', but it won't matter since both themes are the same
-	}, []);
-
-	return <YourApp />;
-}
-```
-
-**Option 2: Lock to one mode**
-
-```typescript
-function App() {
-	const {setThemeMode, setLightThemeStyles, setStaticStyles} = useThemeSelect();
-
-	useEffect(() => {
-		setLightThemeStyles(myTheme);
-		setStaticStyles(staticStyles);
-		setThemeMode('light'); // Always use light mode, ignore dark theme
 	}, []);
 
 	return <YourApp />;
@@ -282,13 +175,13 @@ function App() {
 
 Pass dynamic values to your styles:
 
-```typescript
+```javascript
 import {useHeaderHeight} from '@react-navigation/elements';
 
 const useStyles = createThemedStyles((theme, props) => {
 	return {
 		container: {
-			paddingTop: props.headerHeight + 15,
+			paddingTop: props.headerHeight + 15, // headerHeight is passed to the useStyles hook
 			paddingHorizontal: theme.themeStyles.padding,
 			gap: 15,
 			backgroundColor: theme.themeStyles.background,
@@ -314,9 +207,11 @@ function EmailValidation() {
 
 ### Dynamic Styles with `getDynamicStyles`
 
-Use `getDynamicStyles` when you need to compute styles multiple times with different values (like in lists):
+Use `getDynamicStyles` when you need to compute styles inline with different values (like in lists):
 
-```typescript
+**NOTE**: If extracting a list item into a full react component, you can simply use the useStyles hook. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
+
+```javascript
 const useStyles = createThemedStyles((theme, props) => {
 	return {
 		container: {
@@ -400,6 +295,14 @@ function MyComponent() {
 
 ## API Reference
 
+### `configureTheme(config)`
+
+Creates a "createThemedStyles" function that returns the useStyles hook
+
+**Parameters**
+
+- `config: ThemeConfig` - `ThemeConfig : {lightThemeStyles: ThemeStylesType, darkThemeStyles: ThemeStylesType, staticStyles: StaticStylesType, initialMode: "light" | "dark" | "system"}`
+
 ### `createThemedStyles(stylesFn)`
 
 Creates a hook that returns themed styles.
@@ -416,36 +319,44 @@ Creates a hook that returns themed styles.
 
 ### `useThemeSelect()`
 
-Hook for managing theme mode and custom themes.
+Hook for managing theme mode.
 
 **Returns:**
 
-- `themeMode: 'light' | 'dark' | 'system'` - Current theme mode
-- `setThemeMode(mode: ThemeMode)` - Change theme mode
-- `setLightThemeStyles(styles: ThemeStyles)` - Set light theme styles
-- `setDarkThemeStyles(styles: ThemeStyles)` - Set dark theme styles
-- `setStaticStyles(styles: StaticStyles)` - Set static styles (brand colors, etc.)
+- `theme: 'light' | 'dark' | 'system'` - Current theme mode
+- `setTheme(mode: 'light' | 'dark' | 'system')` - Change theme mode
 
 ### Types
 
 ```typescript
-interface Theme {
-	themeStyles: ThemeStyles; // Styles that CHANGE with light/dark mode
-	staticStyles: StaticStyles; // Styles that STAY THE SAME (brand, etc.)
+interface Theme<
+	ThemeStylesType extends Record<string, any> = Record<string, any>,
+	StaticStylesType extends Record<string, any> = Record<string, any>
+> {
+	themeStyles: ThemeStylesType;
+	staticStyles: StaticStylesType;
 }
 
-interface ThemeStyles {
-	[key: string]: any; // Define your own theme-aware styles by extending this interface
+interface ThemeConfig<
+	ThemeStylesType extends Record<string, any> = Record<string, any>,
+	StaticStylesType extends Record<string, any> = Record<string, any>
+> {
+	lightThemeStyles: ThemeStylesType;
+	darkThemeStyles: ThemeStylesType;
+	staticStyles: StaticStylesType;
+	initialMode?: 'light' | 'dark' | 'system';
 }
 
-interface StaticStyles {
-	[key: string]: any; // Define your own static styles by extending this interface
+interface ThemedStylesHook<
+	Styles,
+	ThemeStylesType extends Record<string, any>,
+	StaticStylesType extends Record<string, any>
+> {
+	styles: Styles;
+	getDynamicStyles: (dynamicProps: any) => Styles;
+	theme: Theme<ThemeStylesType, StaticStylesType>;
 }
-
-type ThemeMode = 'light' | 'dark' | 'system';
 ```
-
-**TypeScript users:** Extend `ThemeStyles` and `StaticStyles` to define your own structure and get full autocomplete (see examples above).
 
 ## Default Themes
 
@@ -457,9 +368,8 @@ See the "Configure Your Themes" section above for examples.
 
 1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders, padding/margins that change with theme)
 2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius, max widths)
-3. **Set custom themes at app startup** - Call `setLightThemeStyles`, `setDarkThemeStyles`, and `setStaticStyles` in your App component's useEffect
-4. **Leverage TypeScript** - Extend `ThemeStyles` and `StaticStyles` interfaces for full autocomplete
-5. **Think beyond colors** - Include fontSize, padding, margin, borderRadius, shadows, etc.
+3. **Set custom themes at app startup** - Call configureTheme to set up your light/dark/static themes.
+4. **Think beyond colors** - Include fontSize, padding, margin, borderRadius, shadows, etc.
 
 ### Example: What goes where?
 
@@ -507,20 +417,27 @@ import {useThemeSelect, createThemedStyles} from 'rn-stylish';
 const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
-	linkText: '#007AFF',
+	linkText: '#0000EE',
 };
 
 const darkThemeStyles = {
-	background: '#000000',
+	background: '#1C1C1E',
 	text: '#FFFFFF',
-	linkText: '#66B2FF',
+	linkText: '#ADD8E6',
 };
 
 const staticStyles = {
-	brand: '#007AFF',
-	success: '#28A745',
-	error: '#DC3545',
+	brand: 'dodgerblue',
+	success: '#008521',
+	error: '#FF3B30',
 };
+
+export const {createThemedStyles} = configureTheme({
+	lightThemeStyles,
+	darkThemeStyles,
+	staticStyles,
+	initialMode: 'system',
+});
 
 const useStyles = createThemedStyles((theme, props) => {
 	return {
@@ -532,16 +449,7 @@ const useStyles = createThemedStyles((theme, props) => {
 });
 
 function App() {
-	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
-		useThemeSelect();
 	const {styles} = useStyles();
-
-	useEffect(() => {
-		// Set your custom themes once at app start
-		setLightThemeStyles(lightThemeStyles);
-		setDarkThemeStyles(darkThemeStyles);
-		setStaticStyles(staticStyles);
-	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
