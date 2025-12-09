@@ -21,7 +21,7 @@ npm install rn-stylish
 
 ### 1. Basic Usage
 
-```javascript
+```typescript
 import {createThemedStyles} from 'rn-stylish';
 import {View, Text} from 'react-native';
 
@@ -56,7 +56,7 @@ function MyComponent() {
 
 ### 2. Theme Switching
 
-```javascript
+```typescript
 import {useThemeSelect} from 'rn-stylish';
 
 function ThemeToggle() {
@@ -131,71 +131,85 @@ function App() {
 }
 ```
 
-### Dynamic Styles with Props
+### Styles with Props
 
-Create styles that respond to component props:
+Pass dynamic values to your styles:
 
 ```typescript
-interface ButtonProps {
-	variant: 'primary' | 'secondary';
-	size: 'small' | 'large';
-}
+import {useHeaderHeight} from '@react-navigation/elements';
 
-const useStyles = createThemedStyles<ButtonProps>((theme, props) => ({
-	button: {
-		backgroundColor:
-			props.variant === 'primary'
-				? theme.staticColors.brand
-				: theme.themeColors.background,
-		padding: props.size === 'large' ? 16 : 8,
-		borderRadius: 8,
+const useStyles = createThemedStyles((theme, props) => ({
+	container: {
+		paddingTop: props.headerHeight + 15,
+		paddingHorizontal: 40,
+		gap: 15,
+		backgroundColor: theme.themeColors.background,
 	},
-	text: {
-		color:
-			props.variant === 'primary'
-				? theme.staticColors.white
-				: theme.themeColors.text,
-		fontSize: props.size === 'large' ? 18 : 14,
+	title: {
+		color: theme.themeColors.text,
+		fontSize: 24,
 	},
 }));
 
-function CustomButton({variant, size, title}: ButtonProps & {title: string}) {
-	const {styles} = useStyles({variant, size});
+function EmailValidation() {
+	const headerHeight = useHeaderHeight();
+	const {styles} = useStyles({headerHeight});
 
 	return (
-		<TouchableOpacity style={styles.button}>
-			<Text style={styles.text}>{title}</Text>
-		</TouchableOpacity>
+		<View style={styles.container}>
+			<Text style={styles.title}>Enter Email</Text>
+		</View>
 	);
 }
 ```
 
-### Runtime Dynamic Styles
+### Dynamic Styles with `getDynamicStyles`
 
-For styles that change during interactions:
+Use `getDynamicStyles` when you need to compute styles multiple times with different values (like in lists):
 
 ```typescript
-const useStyles = createThemedStyles(theme => ({
+const useStyles = createThemedStyles((theme, props) => ({
 	container: {
-		backgroundColor: theme.themeColors.background,
 		flex: 1,
+		backgroundColor: theme.themeColors.background,
+		justifyContent: 'center',
+		gap: 12,
+	},
+	item: {
+		padding: 16,
+		borderRadius: 8,
+		backgroundColor: props.isSelected
+			? theme.staticColors.green
+			: theme.staticColors.gray,
+	},
+	itemText: {
+		color: props.isSelected ? theme.staticColors.white : theme.themeColors.text,
 	},
 }));
 
-function AnimatedComponent() {
-	const {getDynamicStyles, theme} = useStyles();
-	const [isPressed, setIsPressed] = useState(false);
-
-	const dynamicStyles = getDynamicStyles({isPressed});
+function ItemList({items}) {
+	const {styles, getDynamicStyles} = useStyles();
+	const [selectedIndex, setSelectedIndex] = useState(0);
 
 	return (
-		<Pressable
-			onPressIn={() => setIsPressed(true)}
-			onPressOut={() => setIsPressed(false)}
-			style={[dynamicStyles.container, {opacity: isPressed ? 0.7 : 1}]}
-		>
-			<Text>Press me!</Text>
-		</Pressable>
+		<SafeAreaView style={styles.container}>
+			{items.map((item, index) => {
+				// Generate styles dynamically for each item
+				const dynamicStyle = getDynamicStyles({
+					isSelected: index === selectedIndex,
+				});
+
+				return (
+					<TouchableOpacity
+						key={index}
+						style={dynamicStyle.item}
+						onPress={() => setSelectedIndex(index)}
+					>
+						<Text style={dynamicStyle.itemText}>{item.name}</Text>
+					</TouchableOpacity>
+				);
+			})}
+		</SafeAreaView>
 	);
 }
 ```
