@@ -108,17 +108,17 @@ function MyComponent() {
 ### 3. Theme Switching
 
 ```javascript
-import {useThemeControl} from './App'; // Import from where you configured your theme
+import {useThemeControl} from './themes'; // Import from where you configured your theme
 
 function ThemeToggle() {
-	const {theme, setTheme} = useThemeControl();
+	const {themeMode, setThemeMode} = useThemeControl();
 
 	return (
 		<View>
-			<Button title="Light" onPress={() => setTheme('light')} />
-			<Button title="Dark" onPress={() => setTheme('dark')} />
-			<Button title="System" onPress={() => setTheme('system')} />
-			<Text>Current: {theme}</Text>
+			<Button title="Light" onPress={() => setThemeMode('light')} />
+			<Button title="Dark" onPress={() => setThemeMode('dark')} />
+			<Button title="System" onPress={() => setThemeMode('system')} />
+			<Text>Current: {themeMode}</Text>
 		</View>
 	);
 }
@@ -324,8 +324,8 @@ Hook for managing theme mode. Theme preference is automatically persisted to sto
 
 **Returns:**
 
-- `theme: 'light' | 'dark' | 'system'` - Current theme mode
-- `setTheme(mode: 'light' | 'dark' | 'system')` - Change theme mode
+- `themeMode: 'light' | 'dark' | 'system'` - Current theme mode setting
+- `setThemeMode(mode: 'light' | 'dark' | 'system')` - Change theme mode
 
 ### Types
 

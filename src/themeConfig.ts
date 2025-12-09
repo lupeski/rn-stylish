@@ -29,8 +29,8 @@ export function configureTheme<
 
 	// Create useThemeControl hook that uses this specific atom instance
 	function useThemeControl() {
-		const [theme, setTheme] = useAtom(themeModeAtom);
-		return {theme, setTheme};
+		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
+		return {themeMode, setThemeMode};
 	}
 
 	// Create the themed styles function with the configured themes
