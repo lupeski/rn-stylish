@@ -8,12 +8,10 @@ export interface StaticStyles {
 
 export interface Theme<
 	TThemeStyles extends ThemeStyles = ThemeStyles,
-	TStaticStyles extends StaticStyles = StaticStyles,
-	Props extends Record<string, any> = {}
+	TStaticStyles extends StaticStyles = StaticStyles
 > {
 	themeStyles: TThemeStyles;
 	staticStyles: TStaticStyles;
-	props?: Props;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';

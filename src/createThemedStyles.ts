@@ -24,10 +24,7 @@ export function createThemedStyles<
 	Props extends Record<string, any> = {},
 	Styles extends NamedStyles<Styles> = NamedStyles<any>
 >(
-	stylesFn: (
-		theme: Theme<TThemeStyles, TStaticStyles, Props>,
-		props: Props
-	) => Styles
+	stylesFn: (theme: Theme<TThemeStyles, TStaticStyles>, props: Props) => Styles
 ) {
 	return (props?: Props) => {
 		const systemScheme = useColorScheme();
@@ -46,10 +43,9 @@ export function createThemedStyles<
 				systemScheme === 'dark' ? darkThemeStyles : lightThemeStyles;
 		}
 
-		const activeTheme: Theme<TThemeStyles, TStaticStyles, Props> = {
+		const activeTheme: Theme<TThemeStyles, TStaticStyles> = {
 			themeStyles: activeThemeStyles,
 			staticStyles,
-			props,
 		};
 
 		const styles = useMemo(() => {
