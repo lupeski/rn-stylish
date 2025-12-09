@@ -145,7 +145,7 @@ function ThemeToggle() {
 
 ### 4. Single Theme Mode (No Light/Dark Switching)
 
-If your app doesn't need theme switching, you simply omit light and dark themes, and just use staticStyles:
+If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
 
 **Set both themes to the same values**
 
