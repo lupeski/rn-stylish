@@ -9,6 +9,7 @@ A flexible and type-safe theming system for React Native with automatic light/da
 - 🎯 **Simple API** - Easy to use hooks and utilities
 - ⚡ **Performance** - Memoized styles with efficient re-renders
 - 🎭 **Fully customizable** - Define your own theme structure and styles
+- 🔄 **Dynamic theme updates** - Load and apply custom themes at runtime
 - 🔄 **Flexible styling** - Support for colors, font sizes, padding, margins, and any style values
 - 💾 **Persistent preferences** - Theme mode saved automatically across app sessions
 - 📦 **Lightweight** - Minimal dependencies (Jotai and AsyncStorage)
@@ -30,6 +31,9 @@ rn-stylish requires you to define your own theme styles. Set them up in your app
 Create a `themes.ts` or `themes.js` file to define your themes:
 
 ```javascript
+// themes.js
+import {configureTheme} from 'rn-stylish';
+
 export const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
@@ -47,25 +51,14 @@ export const staticStyles = {
 	success: '#008521',
 	error: '#FF3B30',
 };
-```
 
-Then in your App:
-
-```javascript
-// App.tsx / App.js or wherever your app's entry point is
-import {configureTheme} from 'rn-stylish';
-import {lightThemeStyles, darkThemeStyles, staticStyles} from './themes';
-
-export const {createThemedStyles, useThemeControl} = configureTheme({
-	lightThemeStyles,
-	darkThemeStyles,
-	staticStyles,
-	initialMode: 'system',
-});
-
-function App() {
-	return <YourApp />;
-}
+export const {createThemedStyles, useThemeControl, updateThemeConfig} =
+	configureTheme({
+		lightThemeStyles,
+		darkThemeStyles,
+		staticStyles,
+		initialMode: 'system', // optional: 'light' | 'dark' | 'system' (default: 'system')
+	});
 ```
 
 Now when you use themes, you'll get autocomplete for all your custom properties.
@@ -74,7 +67,7 @@ Now when you use themes, you'll get autocomplete for all your custom properties.
 
 ```javascript
 import {View, Text} from 'react-native';
-import {createThemedStyles} from './App.js';
+import {createThemedStyles} from './themes';
 
 const useStyles = createThemedStyles((theme, props) => {
 	return {
@@ -108,7 +101,7 @@ function MyComponent() {
 ### 3. Theme Switching
 
 ```javascript
-import {useThemeControl} from './themes'; // Import from where you configured your theme
+import {useThemeControl} from './themes';
 
 function ThemeToggle() {
 	const {themeMode, setThemeMode, resetThemeMode} = useThemeControl();
@@ -126,6 +119,55 @@ function ThemeToggle() {
 ```
 
 ## Advanced Usage
+
+### Dynamic Theme Updates
+
+Load and apply custom themes at runtime (perfect for user-customizable themes or loading from remote config):
+
+```javascript
+// App.js
+import {useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {updateThemeConfig} from './themes';
+
+function App() {
+	useEffect(() => {
+		async function loadCustomTheme() {
+			// Load custom theme from storage or API
+			const saved = await AsyncStorage.getItem('customTheme');
+
+			if (saved) {
+				const customTheme = JSON.parse(saved);
+
+				// Update themes dynamically - all components auto re-render!
+				updateThemeConfig({
+					lightThemeStyles: customTheme.light,
+					darkThemeStyles: customTheme.dark,
+					staticStyles: customTheme.static,
+				});
+			}
+		}
+
+		loadCustomTheme();
+	}, []);
+
+	return <YourApp />;
+}
+```
+
+**How it works:**
+
+- App starts immediately with default themes from `configureTheme()`
+- Custom themes load in the background
+- `updateThemeConfig()` updates themes and triggers re-renders
+- No splash screen needed - smooth transition to custom themes
+
+**Use cases:**
+
+- User-customizable themes stored in AsyncStorage
+- A/B testing different color schemes
+- Loading themes from remote config
+- Dynamic branding per tenant/organization
 
 ### Styles with Props
 
@@ -253,7 +295,7 @@ function MyComponent() {
 
 ### `configureTheme(config)`
 
-Creates a `createThemedStyles` function and `useThemeControl` hook configured with your theme definitions.
+Creates a `createThemedStyles` function, `useThemeControl` hook, and `updateThemeConfig` function configured with your theme definitions.
 
 **Parameters**
 
@@ -263,7 +305,7 @@ Creates a `createThemedStyles` function and `useThemeControl` hook configured wi
   - `staticStyles: StaticStylesType` - Styles that don't change with theme
   - `initialMode?: 'light' | 'dark' | 'system'` - Initial theme mode (default: 'system'). Only used on first app launch; subsequent launches load from storage.
 
-**Returns:** `{ createThemedStyles, useThemeControl }`
+**Returns:** `{ createThemedStyles, useThemeControl, updateThemeConfig }`
 
 ### `createThemedStyles(stylesFn)`
 
@@ -291,6 +333,26 @@ Hook for managing theme mode. Theme preference is automatically persisted to sto
 - `setThemeMode(mode: 'light' | 'dark' | 'system')` - Change theme mode
 - `resetThemeMode()` - Reset theme mode back to the `initialMode` specified in `configureTheme()`
 
+### `updateThemeConfig(newConfig)`
+
+Dynamically updates theme configuration at runtime. All components using themed styles will automatically re-render with the new theme.
+
+**Parameters:**
+
+- `newConfig: Partial<ThemeConfig>` - Partial theme configuration to update
+  - `lightThemeStyles?: ThemeStylesType` - New light theme styles
+  - `darkThemeStyles?: ThemeStylesType` - New dark theme styles
+  - `staticStyles?: StaticStylesType` - New static styles
+
+**Example:**
+
+```javascript
+updateThemeConfig({
+	lightThemeStyles: {background: '#F0F0F0', text: '#333333'},
+	staticStyles: {brand: '#FF6B6B'},
+});
+```
+
 ## Single Theme Mode (No Light/Dark Switching)
 
 If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
@@ -309,10 +371,6 @@ const staticStyles = {
 export const {createThemedStyles, useThemeControl} = configureTheme({
 	staticStyles,
 });
-
-function App() {
-	return <YourApp />;
-}
 ```
 
 In single-theme mode, access styles directly from `theme.staticStyles`:
@@ -342,15 +400,22 @@ interface Theme<
 	staticStyles: StaticStylesType;
 }
 
-interface ThemeConfig<
+type ThemeConfig<
 	ThemeStylesType extends Record<string, any> = Record<string, any>,
 	StaticStylesType extends Record<string, any> = Record<string, any>
-> {
-	lightThemeStyles: ThemeStylesType;
-	darkThemeStyles: ThemeStylesType;
-	staticStyles: StaticStylesType;
-	initialMode?: ThemeMode;
-}
+> =
+	| {
+			// Dual-theme mode (light/dark switching)
+			lightThemeStyles: ThemeStylesType;
+			darkThemeStyles: ThemeStylesType;
+			staticStyles: StaticStylesType;
+			initialMode?: 'light' | 'dark' | 'system';
+	  }
+	| {
+			// Single-theme mode (no light/dark switching)
+			staticStyles: StaticStylesType;
+			initialMode?: never;
+	  };
 
 interface ThemedStylesHook<
 	Styles,
@@ -377,9 +442,10 @@ See the "Configure Your Themes" section above for examples.
 
 1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders)
 2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius)
-3. **Set custom themes at app startup** - Call `configureTheme` once in your app's entry point
+3. **Set custom themes at app startup** - Call `configureTheme` once in your themes file
 4. **Think beyond colors** - Include fontSize, padding, margin, borderRadius, shadows, etc.
 5. **Theme preferences persist automatically** - User's theme choice is saved and restored on app restart
+6. **Use `updateThemeConfig` for runtime updates** - Perfect for user-customizable themes or remote config
 
 ### Example: What goes where?
 
@@ -433,18 +499,19 @@ export const staticStyles = {
 	error: '#FF3B30',
 };
 
-// App.tsx
-import React from 'react';
-import {SafeAreaView} from 'react-native';
-import {configureTheme} from 'rn-stylish';
-import {lightThemeStyles, darkThemeStyles, staticStyles} from './themes';
+export const {createThemedStyles, useThemeControl, updateThemeConfig} =
+	configureTheme({
+		lightThemeStyles,
+		darkThemeStyles,
+		staticStyles,
+		initialMode: 'system',
+	});
 
-export const {createThemedStyles, useThemeControl} = configureTheme({
-	lightThemeStyles,
-	darkThemeStyles,
-	staticStyles,
-	initialMode: 'system',
-});
+// App.tsx
+import React, {useEffect} from 'react';
+import {SafeAreaView} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {createThemedStyles, updateThemeConfig} from './themes';
 
 const useStyles = createThemedStyles(theme => ({
 	container: {
@@ -455,6 +522,18 @@ const useStyles = createThemedStyles(theme => ({
 
 function App() {
 	const {styles} = useStyles();
+
+	useEffect(() => {
+		// Load custom theme if available
+		async function loadCustomTheme() {
+			const saved = await AsyncStorage.getItem('customTheme');
+			if (saved) {
+				const custom = JSON.parse(saved);
+				updateThemeConfig(custom);
+			}
+		}
+		loadCustomTheme();
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>

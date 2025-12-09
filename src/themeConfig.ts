@@ -1,7 +1,7 @@
 import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
-import {useAtom, useAtomValue} from 'jotai';
+import {useAtom, useAtomValue, atom} from 'jotai';
 import {createThemeModeAtom} from './themeAtom';
 
 export function configureTheme<
@@ -12,22 +12,42 @@ export function configureTheme<
 	const isSingleThemeMode =
 		!('lightThemeStyles' in config) || !('darkThemeStyles' in config);
 
-	const lightThemeStyles =
+	let lightThemeStyles =
 		'lightThemeStyles' in config
 			? config.lightThemeStyles
 			: ({} as ThemeStylesType);
-	const darkThemeStyles =
+	let darkThemeStyles =
 		'darkThemeStyles' in config
 			? config.darkThemeStyles
 			: ({} as ThemeStylesType);
-	const staticStyles = config.staticStyles;
+	let staticStyles = config.staticStyles;
 	const initialMode = 'initialMode' in config ? config.initialMode : 'system';
 
 	// Create the theme atom with the specified initial mode
-	// This will use initialMode only on first app launch, then loads from storage
 	const themeModeAtom = createThemeModeAtom(initialMode || 'system');
 
-	// Create useThemeControl hook that uses this specific atom instance
+	// Counter atom to trigger re-renders when themes are updated
+	const themeVersionAtom = atom(0);
+
+	// Function to update theme configuration dynamically
+	function updateThemeConfig(
+		newConfig: Partial<ThemeConfig<ThemeStylesType, StaticStylesType>>
+	) {
+		if ('lightThemeStyles' in newConfig && newConfig.lightThemeStyles) {
+			lightThemeStyles = newConfig.lightThemeStyles;
+		}
+		if ('darkThemeStyles' in newConfig && newConfig.darkThemeStyles) {
+			darkThemeStyles = newConfig.darkThemeStyles;
+		}
+		if ('staticStyles' in newConfig && newConfig.staticStyles) {
+			staticStyles = newConfig.staticStyles;
+		}
+
+		// Increment version to trigger re-renders in all components using themed styles
+		themeVersionAtom.init = (themeVersionAtom.init || 0) + 1;
+	}
+
+	// Create useThemeControl hook
 	function useThemeControl() {
 		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
 
@@ -53,6 +73,7 @@ export function configureTheme<
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
 			const mode = useAtomValue(themeModeAtom);
+			const themeVersion = useAtomValue(themeVersionAtom); // Subscribe to theme updates
 
 			// Build the full theme object with both themeStyles and staticStyles
 			let activeTheme: Theme<ThemeStylesType, StaticStylesType>;
@@ -79,7 +100,7 @@ export function configureTheme<
 			// Base styles (with optional props)
 			const styles = useMemo(() => {
 				return StyleSheet.create(stylesFn(activeTheme, (props ?? {}) as Props));
-			}, [activeTheme, props]);
+			}, [activeTheme, props, themeVersion]); // Re-compute when theme version changes
 
 			// Helper for generating styles dynamically
 			const getDynamicStyles = (dynamicProps: Props) => {
@@ -90,5 +111,9 @@ export function configureTheme<
 		};
 	}
 
-	return {createThemedStyles, useThemeControl};
+	return {
+		createThemedStyles,
+		useThemeControl,
+		updateThemeConfig,
+	};
 }
