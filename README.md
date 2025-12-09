@@ -22,15 +22,36 @@ npm install rn-stylish
 
 ### 1. Configure Your Themes (Required!)
 
-rn-stylish requires you to define your own theme styles. Set them up in your app's entry point before using any themed components:
+rn-stylish requires you to define your own theme styles. Set them up in your app's entry point before using any themed components.
+
+#### TypeScript Setup (Recommended - with autocomplete!)
+
+Create a `theme.ts` file to define your themes with full type safety:
 
 ```typescript
-// App.tsx or index.js
-import {useThemeSelect} from 'rn-stylish';
-import {useEffect} from 'react';
+// theme.ts
+import {ThemeColors, StaticColors} from 'rn-stylish';
 
-// Define your light theme styles
-const lightThemeStyles = {
+// Define your theme structure with autocomplete
+export interface MyThemeColors extends ThemeColors {
+	background: string;
+	text: string;
+	linkText: string;
+	cardBackground: string;
+	border: string;
+	placeholder: string;
+}
+
+export interface MyStaticColors extends StaticColors {
+	brand: string;
+	success: string;
+	error: string;
+	warning: string;
+	info: string;
+}
+
+// Light theme
+export const lightThemeStyles: MyThemeColors = {
 	background: '#FFFFFF',
 	text: '#000000',
 	linkText: '#007AFF',
@@ -39,8 +60,8 @@ const lightThemeStyles = {
 	placeholder: '#6C757D',
 };
 
-// Define your dark theme styles
-const darkThemeStyles = {
+// Dark theme
+export const darkThemeStyles: MyThemeColors = {
 	background: '#000000',
 	text: '#FFFFFF',
 	linkText: '#66B2FF',
@@ -49,21 +70,90 @@ const darkThemeStyles = {
 	placeholder: '#ADB5BD',
 };
 
-// Define your static styles (same in both themes)
-const staticStyles = {
+// Static styles
+export const staticStyles: MyStaticColors = {
 	brand: '#007AFF',
 	success: '#28A745',
 	error: '#DC3545',
 	warning: '#FFC107',
 	info: '#17A2B8',
 };
+```
+
+Then in your App:
+
+```typescript
+// App.tsx
+import {useEffect} from 'react';
+import {useThemeSelect} from 'rn-stylish';
+import {lightThemeStyles, darkThemeStyles, staticStyles} from './theme';
 
 function App() {
 	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
 		useThemeSelect();
 
 	useEffect(() => {
-		// REQUIRED: Set your theme styles at app startup
+		setLightThemeStyles(lightThemeStyles);
+		setDarkThemeStyles(darkThemeStyles);
+		setStaticStyles(staticStyles);
+	}, []);
+
+	return <YourApp />;
+}
+```
+
+Now when you use themes, you'll get autocomplete for all your custom properties!
+
+#### JavaScript Setup
+
+If you're not using TypeScript, create a `theme.js` file:
+
+```javascript
+// theme.js
+
+// Light theme
+export const lightThemeStyles = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#007AFF',
+	cardBackground: '#F8F9FA',
+	border: '#DEE2E6',
+	placeholder: '#6C757D',
+};
+
+// Dark theme
+export const darkThemeStyles = {
+	background: '#000000',
+	text: '#FFFFFF',
+	linkText: '#66B2FF',
+	cardBackground: '#1C1C1C',
+	border: '#343A40',
+	placeholder: '#ADB5BD',
+};
+
+// Static styles
+export const staticStyles = {
+	brand: '#007AFF',
+	success: '#28A745',
+	error: '#DC3545',
+	warning: '#FFC107',
+	info: '#17A2B8',
+};
+```
+
+Then in your App:
+
+```javascript
+// App.js
+import {useEffect} from 'react';
+import {useThemeSelect} from 'rn-stylish';
+import {lightThemeStyles, darkThemeStyles, staticStyles} from './theme';
+
+function App() {
+	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
+		useThemeSelect();
+
+	useEffect(() => {
 		setLightThemeStyles(lightThemeStyles);
 		setDarkThemeStyles(darkThemeStyles);
 		setStaticStyles(staticStyles);
@@ -79,10 +169,10 @@ function App() {
 import {createThemedStyles} from 'rn-stylish';
 import {View, Text} from 'react-native';
 
-// Create themed styles
+// TypeScript users get full autocomplete for theme.themeColors and theme.staticColors!
 const useStyles = createThemedStyles(theme => ({
 	container: {
-		backgroundColor: theme.themeColors.background,
+		backgroundColor: theme.themeColors.background, // autocomplete shows: background, text, linkText, cardBackground, etc.
 		flex: 1,
 		padding: 20,
 	},
@@ -90,8 +180,14 @@ const useStyles = createThemedStyles(theme => ({
 		color: theme.themeColors.text,
 		fontSize: 16,
 	},
+	card: {
+		backgroundColor: theme.themeColors.cardBackground,
+		borderColor: theme.themeColors.border,
+		borderWidth: 1,
+		padding: 16,
+	},
 	brandText: {
-		color: theme.staticColors.brand,
+		color: theme.staticColors.brand, // autocomplete shows: brand, success, error, warning, info
 		fontWeight: 'bold',
 	},
 	successButton: {
@@ -107,8 +203,10 @@ function MyComponent() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>This text color changes with theme</Text>
-			<Text style={styles.brandText}>This stays your brand color</Text>
+			<View style={styles.card}>
+				<Text style={styles.text}>This text color changes with theme</Text>
+				<Text style={styles.brandText}>This stays your brand color</Text>
+			</View>
 		</View>
 	);
 }
