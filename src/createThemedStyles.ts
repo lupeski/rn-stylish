@@ -29,25 +29,25 @@ export function createThemedStyles<
 		const darkThemeStyles = useAtomValue(darkThemeStylesAtom);
 		const staticStyles = useAtomValue(staticStylesAtom);
 
-		let activeThemeColors;
+		let activeThemeStyles;
 		if (mode === 'light') {
-			activeThemeColors = lightThemeStyles;
+			activeThemeStyles = lightThemeStyles;
 		} else if (mode === 'dark') {
-			activeThemeColors = darkThemeStyles;
+			activeThemeStyles = darkThemeStyles;
 		} else {
-			activeThemeColors =
+			activeThemeStyles =
 				systemScheme === 'dark' ? darkThemeStyles : lightThemeStyles;
 		}
 
 		// Compose the theme object
 		const activeTheme: Theme = {
-			themeColors: activeThemeColors,
-			staticColors: staticStyles,
+			themeStyles: activeThemeStyles,
+			staticStyles: staticStyles,
 		};
 
 		const styles = useMemo(() => {
 			return StyleSheet.create(stylesFn(activeTheme, (props ?? {}) as Props));
-		}, [activeThemeColors, staticStyles, props]);
+		}, [activeThemeStyles, staticStyles, props]);
 
 		const getDynamicStyles = (dynamicProps: Props) => {
 			return StyleSheet.create(stylesFn(activeTheme, dynamicProps));

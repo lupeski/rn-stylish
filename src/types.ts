@@ -1,17 +1,14 @@
-export interface ThemeColors {
-	background: string;
-	text: string;
-	linkText: string;
-	[key: string]: string;
+export interface ThemeStyles {
+	[key: string]: any;
 }
 
-export interface StaticColors {
-	[key: string]: string;
+export interface StaticStyles {
+	[key: string]: any;
 }
 
 export interface Theme {
-	themeColors: ThemeColors;
-	staticColors: StaticColors;
+	themeStyles: ThemeStyles;
+	staticStyles: StaticStyles;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';

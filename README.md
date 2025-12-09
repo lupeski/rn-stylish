@@ -30,53 +30,63 @@ Create a `theme.ts` file to define your themes with full type safety:
 
 ```typescript
 // theme.ts
-import {ThemeColors, StaticColors} from 'rn-stylish';
+import {ThemeStyles, StaticStyles} from 'rn-stylish';
 
 // Define your theme structure with autocomplete
-export interface MyThemeColors extends ThemeColors {
+export interface MyThemeStyles extends ThemeStyles {
 	background: string;
 	text: string;
 	linkText: string;
 	cardBackground: string;
 	border: string;
 	placeholder: string;
+	fontSize: number;
+	spacing: number;
 }
 
-export interface MyStaticColors extends StaticColors {
+export interface MyStaticStyles extends StaticStyles {
 	brand: string;
 	success: string;
 	error: string;
 	warning: string;
 	info: string;
+	borderRadius: number;
+	maxWidth: number;
 }
 
 // Light theme
-export const lightThemeStyles: MyThemeColors = {
+export const lightThemeStyles: MyThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
 	linkText: '#007AFF',
 	cardBackground: '#F8F9FA',
 	border: '#DEE2E6',
 	placeholder: '#6C757D',
+	fontSize: 16,
+	spacing: 16,
 };
 
 // Dark theme
-export const darkThemeStyles: MyThemeColors = {
+export const darkThemeStyles: MyThemeStyles = {
 	background: '#000000',
 	text: '#FFFFFF',
 	linkText: '#66B2FF',
 	cardBackground: '#1C1C1C',
 	border: '#343A40',
 	placeholder: '#ADB5BD',
+	fontSize: 16,
+	spacing: 16,
 };
 
 // Static styles
-export const staticStyles: MyStaticColors = {
+export const staticStyles: MyStaticStyles = {
 	brand: '#007AFF',
 	success: '#28A745',
 	error: '#DC3545',
 	warning: '#FFC107',
 	info: '#17A2B8',
+	borderRadius: 8,
+	maxWidth: 1200,
 };
 ```
 
@@ -119,6 +129,8 @@ export const lightThemeStyles = {
 	cardBackground: '#F8F9FA',
 	border: '#DEE2E6',
 	placeholder: '#6C757D',
+	fontSize: 16,
+	spacing: 16,
 };
 
 // Dark theme
@@ -129,6 +141,8 @@ export const darkThemeStyles = {
 	cardBackground: '#1C1C1C',
 	border: '#343A40',
 	placeholder: '#ADB5BD',
+	fontSize: 16,
+	spacing: 16,
 };
 
 // Static styles
@@ -138,6 +152,8 @@ export const staticStyles = {
 	error: '#DC3545',
 	warning: '#FFC107',
 	info: '#17A2B8',
+	borderRadius: 8,
+	maxWidth: 1200,
 };
 ```
 
@@ -169,31 +185,32 @@ function App() {
 import {createThemedStyles} from 'rn-stylish';
 import {View, Text} from 'react-native';
 
-// TypeScript users get full autocomplete for theme.themeColors and theme.staticColors!
+// TypeScript users get full autocomplete for theme.themeStyles and theme.staticStyles!
 const useStyles = createThemedStyles(theme => ({
 	container: {
-		backgroundColor: theme.themeColors.background, // autocomplete shows: background, text, linkText, cardBackground, etc.
+		backgroundColor: theme.themeStyles.background, // autocomplete shows: background, text, linkText, cardBackground, fontSize, spacing, etc.
 		flex: 1,
-		padding: 20,
+		padding: theme.themeStyles.spacing, // Non-color values work too!
 	},
 	text: {
-		color: theme.themeColors.text,
-		fontSize: 16,
+		color: theme.themeStyles.text,
+		fontSize: theme.themeStyles.fontSize,
 	},
 	card: {
-		backgroundColor: theme.themeColors.cardBackground,
-		borderColor: theme.themeColors.border,
+		backgroundColor: theme.themeStyles.cardBackground,
+		borderColor: theme.themeStyles.border,
 		borderWidth: 1,
+		borderRadius: theme.staticStyles.borderRadius, // Static styles here
 		padding: 16,
 	},
 	brandText: {
-		color: theme.staticColors.brand, // autocomplete shows: brand, success, error, warning, info
+		color: theme.staticStyles.brand, // autocomplete shows: brand, success, error, warning, info, borderRadius, maxWidth
 		fontWeight: 'bold',
 	},
 	successButton: {
-		backgroundColor: theme.staticColors.success,
+		backgroundColor: theme.staticStyles.success,
 		padding: 12,
-		borderRadius: 8,
+		borderRadius: theme.staticStyles.borderRadius,
 	},
 }));
 
@@ -321,13 +338,13 @@ import {useHeaderHeight} from '@react-navigation/elements';
 const useStyles = createThemedStyles((theme, props) => ({
 	container: {
 		paddingTop: props.headerHeight + 15,
-		paddingHorizontal: 40,
+		paddingHorizontal: theme.themeStyles.spacing, // Use theme values with props!
 		gap: 15,
-		backgroundColor: theme.themeColors.background,
+		backgroundColor: theme.themeStyles.background,
 	},
 	title: {
-		color: theme.themeColors.text,
-		fontSize: 24,
+		color: theme.themeStyles.text,
+		fontSize: theme.themeStyles.fontSize,
 	},
 }));
 
@@ -401,7 +418,7 @@ Sometimes you need theme values outside of styles:
 ```typescript
 const useStyles = createThemedStyles(theme => ({
 	container: {
-		backgroundColor: theme.themeColors.background,
+		backgroundColor: theme.themeStyles.background,
 	},
 }));
 
@@ -410,7 +427,7 @@ function MyComponent() {
 
 	// Use theme values directly
 	const statusBarStyle =
-		theme.themeColors.background === '#FFFFFF'
+		theme.themeStyles.background === '#FFFFFF'
 			? 'dark-content'
 			: 'light-content';
 
@@ -449,31 +466,30 @@ Hook for managing theme mode and custom themes.
 
 - `themeMode: 'light' | 'dark' | 'system'` - Current theme mode
 - `setThemeMode(mode: ThemeMode)` - Change theme mode
-- `setLightThemeStyles(styles: ThemeColors)` - Set light theme styles
-- `setDarkThemeStyles(styles: ThemeColors)` - Set dark theme styles
-- `setStaticStyles(styles: StaticColors)` - Set static styles (brand colors, etc.)
+- `setLightThemeStyles(styles: ThemeStyles)` - Set light theme styles
+- `setDarkThemeStyles(styles: ThemeStyles)` - Set dark theme styles
+- `setStaticStyles(styles: StaticStyles)` - Set static styles (brand colors, etc.)
 
 ### Types
 
 ```typescript
 interface Theme {
-	themeColors: ThemeColors; // Colors that CHANGE with light/dark mode
-	staticColors: StaticColors; // Colors that STAY THE SAME (brand, etc.)
+	themeStyles: ThemeStyles; // Styles that CHANGE with light/dark mode
+	staticStyles: StaticStyles; // Styles that STAY THE SAME (brand, etc.)
 }
 
-interface ThemeColors {
-	background: string; // Changes: light bg in light mode, dark bg in dark mode
-	text: string; // Changes: dark text in light mode, light text in dark mode
-	linkText: string;
-	[key: string]: string; // Add your own theme-aware colors
+interface ThemeStyles {
+	[key: string]: any; // Define your own theme-aware styles by extending this interface
 }
 
-interface StaticColors {
-	[key: string]: string; // Brand colors, success/error colors - consistent across themes
+interface StaticStyles {
+	[key: string]: any; // Define your own static styles by extending this interface
 }
 
 type ThemeMode = 'light' | 'dark' | 'system';
 ```
+
+**TypeScript users:** Extend `ThemeStyles` and `StaticStyles` to define your own structure and get full autocomplete (see examples above).
 
 ## Default Themes
 
@@ -483,11 +499,11 @@ See the "Configure Your Themes" section above for examples.
 
 ## Best Practices
 
-1. **Use `themeColors` for UI styles that should adapt** to light/dark mode (backgrounds, text, borders)
-2. **Use `staticColors` for brand identity and semantic styles** that should stay consistent (your logo color, success green, error red, warning yellow)
+1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders, theme-specific spacing)
+2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius, max widths)
 3. **Set custom themes at app startup** - Call `setLightThemeStyles`, `setDarkThemeStyles`, and `setStaticStyles` in your App component's useEffect
-4. **Leverage TypeScript** - the package is fully typed for great autocomplete
-5. **Think beyond colors** - Theme and static styles can include any style values (fontSize, spacing, borderRadius, etc.)
+4. **Leverage TypeScript** - Extend `ThemeStyles` and `StaticStyles` interfaces for full autocomplete
+5. **Think beyond colors** - Include fontSize, spacing, borderRadius, shadows, etc.
 
 ### Example: What goes where?
 
@@ -498,7 +514,8 @@ lightThemeStyles: {
   text: '#000000',
   cardBackground: '#F5F5F5',
   border: '#E0E0E0',
-  fontSize: 16,  // Can be more than just colors!
+  spacing: 16,           // Can include numbers!
+  fontSize: 16,
 }
 
 darkThemeStyles: {
@@ -506,6 +523,7 @@ darkThemeStyles: {
   text: '#FFFFFF',
   cardBackground: '#1C1C1E',
   border: '#3A3A3C',
+  spacing: 16,           // Same spacing, but could be different
   fontSize: 16,
 }
 
@@ -515,9 +533,9 @@ staticStyles: {
   success: '#51CF66',    // Success state - always green
   error: '#FF3B30',      // Error state - always red
   warning: '#FFD93D',    // Warning state - always yellow
-  white: '#FFFFFF',
-  black: '#000000',
-  borderRadius: 8,       // Can be more than just colors!
+  borderRadius: 8,       // Design system constants
+  maxWidth: 1200,
+  headerHeight: 60,
 }
 ```
 
@@ -551,7 +569,7 @@ const staticStyles = {
 const useStyles = createThemedStyles(theme => ({
 	container: {
 		flex: 1,
-		backgroundColor: theme.themeColors.background,
+		backgroundColor: theme.themeStyles.background,
 	},
 }));
 

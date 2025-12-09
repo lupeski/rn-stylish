@@ -5,7 +5,7 @@ import {
 	darkThemeStylesAtom,
 	staticStylesAtom,
 } from './themeAtom';
-import {ThemeColors, StaticColors, ThemeMode} from './types';
+import {ThemeStyles, StaticStyles, ThemeMode} from './types';
 
 export const useThemeSelect = () => {
 	const [themeMode, setThemeMode] = useAtom(themeModeAtom);
@@ -16,8 +16,8 @@ export const useThemeSelect = () => {
 	return {
 		themeMode,
 		setThemeMode: (mode: ThemeMode) => setThemeMode(mode),
-		setLightThemeStyles: (styles: ThemeColors) => setLightThemeStyles(styles),
-		setDarkThemeStyles: (styles: ThemeColors) => setDarkThemeStyles(styles),
-		setStaticStyles: (styles: StaticColors) => setStaticStyles(styles),
+		setLightThemeStyles: (styles: ThemeStyles) => setLightThemeStyles(styles),
+		setDarkThemeStyles: (styles: ThemeStyles) => setDarkThemeStyles(styles),
+		setStaticStyles: (styles: StaticStyles) => setStaticStyles(styles),
 	};
 };
