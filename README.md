@@ -154,14 +154,12 @@ const staticStyles = {
 	linkText: '#007AFF',
 };
 
+export const {createThemedStyles} = configureTheme({
+	staticStyles,
+	initialMode: 'system',
+});
+
 function App() {
-	const {setStaticStyles} = useThemeSelect();
-
-	useEffect(() => {
-		// Just set static styles
-		setStaticStyles(staticStyles);
-	}, []);
-
 	return <YourApp />;
 }
 ```
