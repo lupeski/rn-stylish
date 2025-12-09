@@ -1,9 +1,6 @@
 import {atomWithStorage} from 'jotai/utils';
-import {atom} from 'jotai';
-import {ThemeMode} from './types';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
+// This atom will auto-load from storage on subsequent app launches
 export const themeModeAtom = atomWithStorage<ThemeMode>('themeMode', 'system');
-
-export const lightThemeStylesAtom = atom<Record<string, any>>({});
-export const darkThemeStylesAtom = atom<Record<string, any>>({});
-export const staticStylesAtom = atom<Record<string, any>>({});
