@@ -11,7 +11,7 @@ A flexible and type-safe theming system for React Native with automatic light/da
 - 🎭 **Fully customizable** - Define your own theme structure and styles
 - 🔄 **Flexible styling** - Support for colors, font sizes, padding, margins, and any style values
 - 💾 **Persistent preferences** - Theme mode saved automatically across app sessions
-- 📦 **Lightweight** - Minimal dependencies (just Jotai for state)
+- 📦 **Lightweight** - Minimal dependencies (Jotai and AsyncStorage)
 
 ## Installation
 
@@ -279,7 +279,19 @@ Creates a hook that returns themed styles.
 - `getDynamicStyles(props)` - Function to generate styles with different props at runtime
 - `theme` - Current active theme object with `themeStyles` and `staticStyles`
 
-### 4. Single Theme Mode (No Light/Dark Switching)
+### `useThemeControl()`
+
+Hook for managing theme mode. Theme preference is automatically persisted to storage. **This hook is returned from `configureTheme()` and must be imported from where you configured your theme**, not from the rn-stylish package directly.
+
+**Note:** This hook is only useful when you've configured light and dark themes. In single-theme mode, theme switching has no effect.
+
+**Returns:**
+
+- `themeMode: 'light' | 'dark' | 'system'` - Current theme mode setting
+- `setThemeMode(mode: 'light' | 'dark' | 'system')` - Change theme mode
+- `resetThemeMode()` - Reset theme mode back to the `initialMode` specified in `configureTheme()`
+
+## Single Theme Mode (No Light/Dark Switching)
 
 If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
 
@@ -317,19 +329,7 @@ const useStyles = createThemedStyles(theme => ({
 }));
 ```
 
-### `useThemeControl()`
-
-Hook for managing theme mode. Theme preference is automatically persisted to storage. **This hook is returned from `configureTheme()` and must be imported from where you configured your theme**, not from the rn-stylish package directly.
-
-**Note:** This hook is only useful when you've configured light and dark themes. In single-theme mode, theme switching has no effect.
-
-**Returns:**
-
-- `themeMode: 'light' | 'dark' | 'system'` - Current theme mode setting
-- `setThemeMode(mode: 'light' | 'dark' | 'system')` - Change theme mode
-- `resetThemeMode()` - Reset theme mode back to the `initialMode` specified in `configureTheme()`
-
-### Types
+## Types
 
 ```typescript
 type ThemeMode = 'light' | 'dark' | 'system';
