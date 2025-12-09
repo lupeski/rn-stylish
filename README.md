@@ -67,12 +67,26 @@ const staticStyles = {
 };
 
 // Export types using typeof for autocomplete
-export type MyThemeStyles = typeof lightThemeStyles;
-export type MyStaticStyles = typeof staticStyles;
+export type AppThemeStyles = typeof lightThemeStyles;
+export type AppStaticStyles = typeof staticStyles;
 
 // Export the actual theme objects
 export {lightThemeStyles, darkThemeStyles, staticStyles};
 ```
+
+**Important for TypeScript autocomplete:** To get autocomplete for your theme properties (like `theme.themeStyles.background`), you need to augment the module types. Create a `theme.d.ts` file:
+
+```typescript
+// theme.d.ts
+import {AppThemeStyles, AppStaticStyles} from './theme';
+
+declare module 'rn-stylish' {
+	interface ThemeStyles extends AppThemeStyles {}
+	interface StaticStyles extends AppStaticStyles {}
+}
+```
+
+Now you'll get full autocomplete everywhere you use `theme.themeStyles.` or `theme.staticStyles.`!
 
 Then in your App:
 
@@ -525,12 +539,14 @@ const staticStyles = {
 	error: '#DC3545',
 };
 
-const useStyles = createThemedStyles(theme => ({
-	container: {
-		flex: 1,
-		backgroundColor: theme.themeStyles.background,
-	},
-}));
+const useStyles = createThemedStyles((theme, props) => {
+	return {
+		container: {
+			flex: 1,
+			backgroundColor: theme.themeStyles.background,
+		},
+	};
+});
 
 function App() {
 	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
