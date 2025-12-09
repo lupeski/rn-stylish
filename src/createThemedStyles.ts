@@ -1,4 +1,10 @@
-import {StyleSheet, ViewStyle, TextStyle, ImageStyle} from 'react-native';
+import {
+	StyleSheet,
+	ViewStyle,
+	TextStyle,
+	ImageStyle,
+	useColorScheme,
+} from 'react-native';
 import {useMemo} from 'react';
 import {useAtomValue} from 'jotai';
 import {
@@ -26,12 +32,24 @@ export function createThemedStyles<
 		const darkThemeStyles = useAtomValue(darkThemeStylesAtom) as TThemeStyles;
 		const staticStyles = useAtomValue(staticStylesAtom) as TStaticStyles;
 
-		const activeThemeStyles: TThemeStyles =
-			mode === 'light'
-				? lightThemeStyles
-				: mode === 'dark'
-				? darkThemeStyles
-				: lightThemeStyles; // fallback for 'system'
+		const systemScheme = useColorScheme();
+
+		let activeThemeStyles: TThemeStyles;
+
+		if (mode === 'light') {
+			activeThemeStyles = lightThemeStyles;
+		} else if (mode === 'dark') {
+			activeThemeStyles = darkThemeStyles;
+		} else if (mode === 'system') {
+			if (systemScheme === 'dark') {
+				activeThemeStyles = darkThemeStyles;
+			} else {
+				activeThemeStyles = lightThemeStyles;
+			}
+		} else {
+			// fallback if mode is somehow undefined
+			activeThemeStyles = lightThemeStyles;
+		}
 
 		const activeTheme: Theme<TThemeStyles, TStaticStyles> = {
 			themeStyles: activeThemeStyles,
