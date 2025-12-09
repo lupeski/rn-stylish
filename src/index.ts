@@ -6,5 +6,4 @@ export {
 	darkThemeStylesAtom,
 	staticStylesAtom,
 } from './themeAtom';
-export {defaultLightTheme, defaultDarkTheme} from './defaultTheme';
 export type {Theme, ThemeMode, ThemeColors, StaticColors} from './types';

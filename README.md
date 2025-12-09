@@ -20,40 +20,42 @@ npm install rn-stylish
 
 ## Quick Start
 
-### 1. Configure Your Themes (Do This First!)
+### 1. Configure Your Themes (Required!)
 
-Before using the theming system, set up your custom theme styles and static styles in your app's entry point:
+rn-stylish requires you to define your own theme styles. Set them up in your app's entry point before using any themed components:
 
 ```typescript
 // App.tsx or index.js
 import {useThemeSelect} from 'rn-stylish';
 import {useEffect} from 'react';
 
-// Define your theme styles (changes between light/dark mode)
+// Define your light theme styles
 const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
-	linkText: '#0000EE',
-	cardBackground: '#F5F5F5',
-	border: '#E0E0E0',
+	linkText: '#007AFF',
+	cardBackground: '#F8F9FA',
+	border: '#DEE2E6',
+	placeholder: '#6C757D',
 };
 
+// Define your dark theme styles
 const darkThemeStyles = {
-	background: '#1C1C1E',
+	background: '#000000',
 	text: '#FFFFFF',
-	linkText: '#ADD8E6',
-	cardBackground: '#2C2C2E',
-	border: '#3A3A3C',
+	linkText: '#66B2FF',
+	cardBackground: '#1C1C1C',
+	border: '#343A40',
+	placeholder: '#ADB5BD',
 };
 
-// Define your static styles (stays the same regardless of theme)
+// Define your static styles (same in both themes)
 const staticStyles = {
-	brand: '#FF6B6B',
-	white: '#FFFFFF',
-	black: '#000000',
-	success: '#51CF66',
-	error: '#FF3B30',
-	warning: '#FFD93D',
+	brand: '#007AFF',
+	success: '#28A745',
+	error: '#DC3545',
+	warning: '#FFC107',
+	info: '#17A2B8',
 };
 
 function App() {
@@ -61,7 +63,7 @@ function App() {
 		useThemeSelect();
 
 	useEffect(() => {
-		// Set your theme styles once at app startup
+		// REQUIRED: Set your theme styles at app startup
 		setLightThemeStyles(lightThemeStyles);
 		setDarkThemeStyles(darkThemeStyles);
 		setStaticStyles(staticStyles);
@@ -71,7 +73,7 @@ function App() {
 }
 ```
 
-### 2. Basic Usage
+### 2. Create Themed Styles
 
 ```typescript
 import {createThemedStyles} from 'rn-stylish';
@@ -92,6 +94,11 @@ const useStyles = createThemedStyles(theme => ({
 		color: theme.staticColors.brand,
 		fontWeight: 'bold',
 	},
+	successButton: {
+		backgroundColor: theme.staticColors.success,
+		padding: 12,
+		borderRadius: 8,
+	},
 }));
 
 // Use in your component
@@ -107,7 +114,7 @@ function MyComponent() {
 }
 ```
 
-### 2. Theme Switching
+### 3. Theme Switching
 
 ```typescript
 import {useThemeSelect} from 'rn-stylish';
@@ -372,46 +379,9 @@ type ThemeMode = 'light' | 'dark' | 'system';
 
 ## Default Themes
 
-rn-stylish comes with sensible defaults:
+rn-stylish does not include default themes. You must define your own theme styles when setting up your app. This gives you complete control over your app's appearance.
 
-**Light Theme:**
-
-```typescript
-{
-  themeColors: {
-    background: '#FFFFFF',
-    text: '#000000',
-    linkText: '#0000EE',
-  },
-  staticColors: {
-    brand: 'dodgerblue',
-    white: 'white',
-    green: '#008521',
-    red: '#FF3B30',
-    gray: '#808080',
-  }
-}
-```
-
-**Dark Theme:**
-
-```typescript
-{
-  themeColors: {
-    background: '#1C1C1E',  // Different from light
-    text: '#FFFFFF',         // Different from light
-    linkText: '#ADD8E6',     // Different from light
-  },
-  staticColors: {
-    // SAME as light theme - these don't change
-    brand: 'dodgerblue',
-    white: 'white',
-    green: '#008521',
-    red: '#FF3B30',
-    gray: '#808080',
-  }
-}
-```
+See the "Configure Your Themes" section above for examples.
 
 ## Best Practices
 
@@ -465,19 +435,19 @@ import {useThemeSelect, createThemedStyles} from 'rn-stylish';
 const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
-	linkText: '#0000EE',
+	linkText: '#007AFF',
 };
 
 const darkThemeStyles = {
-	background: '#1C1C1E',
+	background: '#000000',
 	text: '#FFFFFF',
-	linkText: '#ADD8E6',
+	linkText: '#66B2FF',
 };
 
 const staticStyles = {
-	brand: '#FF6B6B',
-	success: '#51CF66',
-	error: '#FF3B30',
+	brand: '#007AFF',
+	success: '#28A745',
+	error: '#DC3545',
 };
 
 const useStyles = createThemedStyles(theme => ({
