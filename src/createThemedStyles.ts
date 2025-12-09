@@ -8,7 +8,12 @@ import {
 import {useMemo} from 'react';
 import {useAtomValue} from 'jotai';
 import {Theme} from './types';
-import {themeModeAtom, lightThemeAtom, darkThemeAtom} from './themeAtom';
+import {
+	themeModeAtom,
+	lightThemeStylesAtom,
+	darkThemeStylesAtom,
+	staticStylesAtom,
+} from './themeAtom';
 
 type RNStyle = ViewStyle | TextStyle | ImageStyle;
 type NamedStyles<T> = {[P in keyof T]: RNStyle};
@@ -20,21 +25,29 @@ export function createThemedStyles<
 	return (props?: Props) => {
 		const systemScheme = useColorScheme();
 		const mode = useAtomValue(themeModeAtom);
-		const lightTheme = useAtomValue(lightThemeAtom);
-		const darkTheme = useAtomValue(darkThemeAtom);
+		const lightThemeStyles = useAtomValue(lightThemeStylesAtom);
+		const darkThemeStyles = useAtomValue(darkThemeStylesAtom);
+		const staticStyles = useAtomValue(staticStylesAtom);
 
-		let activeTheme: Theme;
+		let activeThemeColors;
 		if (mode === 'light') {
-			activeTheme = lightTheme;
+			activeThemeColors = lightThemeStyles;
 		} else if (mode === 'dark') {
-			activeTheme = darkTheme;
+			activeThemeColors = darkThemeStyles;
 		} else {
-			activeTheme = systemScheme === 'dark' ? darkTheme : lightTheme;
+			activeThemeColors =
+				systemScheme === 'dark' ? darkThemeStyles : lightThemeStyles;
 		}
+
+		// Compose the theme object
+		const activeTheme: Theme = {
+			themeColors: activeThemeColors,
+			staticColors: staticStyles,
+		};
 
 		const styles = useMemo(() => {
 			return StyleSheet.create(stylesFn(activeTheme, (props ?? {}) as Props));
-		}, [activeTheme, props, lightTheme, darkTheme]);
+		}, [activeThemeColors, staticStyles, props]);
 
 		const getDynamicStyles = (dynamicProps: Props) => {
 			return StyleSheet.create(stylesFn(activeTheme, dynamicProps));

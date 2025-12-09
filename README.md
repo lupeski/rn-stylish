@@ -9,6 +9,7 @@ A flexible and type-safe theming system for React Native with automatic light/da
 - 🎯 **Simple API** - Easy to use hooks and utilities
 - ⚡ **Performance** - Memoized styles with efficient re-renders
 - 🎭 **Customizable** - Override default themes with your own colors
+- 🎨 **Theme & Static Colors** - Colors that change with theme + colors that stay consistent
 - 📦 **Lightweight** - Minimal dependencies (just Jotai for state)
 
 ## Installation
@@ -19,7 +20,58 @@ npm install rn-stylish
 
 ## Quick Start
 
-### 1. Basic Usage
+### 1. Configure Your Themes (Do This First!)
+
+Before using the theming system, set up your custom theme styles and static styles in your app's entry point:
+
+```typescript
+// App.tsx or index.js
+import {useThemeSelect} from 'rn-stylish';
+import {useEffect} from 'react';
+
+// Define your theme styles (changes between light/dark mode)
+const lightThemeStyles = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#0000EE',
+	cardBackground: '#F5F5F5',
+	border: '#E0E0E0',
+};
+
+const darkThemeStyles = {
+	background: '#1C1C1E',
+	text: '#FFFFFF',
+	linkText: '#ADD8E6',
+	cardBackground: '#2C2C2E',
+	border: '#3A3A3C',
+};
+
+// Define your static styles (stays the same regardless of theme)
+const staticStyles = {
+	brand: '#FF6B6B',
+	white: '#FFFFFF',
+	black: '#000000',
+	success: '#51CF66',
+	error: '#FF3B30',
+	warning: '#FFD93D',
+};
+
+function App() {
+	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
+		useThemeSelect();
+
+	useEffect(() => {
+		// Set your theme styles once at app startup
+		setLightThemeStyles(lightThemeStyles);
+		setDarkThemeStyles(darkThemeStyles);
+		setStaticStyles(staticStyles);
+	}, []);
+
+	return <YourApp />;
+}
+```
+
+### 2. Basic Usage
 
 ```typescript
 import {createThemedStyles} from 'rn-stylish';
@@ -38,17 +90,18 @@ const useStyles = createThemedStyles(theme => ({
 	},
 	brandText: {
 		color: theme.staticColors.brand,
+		fontWeight: 'bold',
 	},
 }));
 
 // Use in your component
 function MyComponent() {
-	const {styles, theme} = useStyles();
+	const {styles} = useStyles();
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>Hello World</Text>
-			<Text style={styles.brandText}>Brand Color</Text>
+			<Text style={styles.text}>This text color changes with theme</Text>
+			<Text style={styles.brandText}>This stays your brand color</Text>
 		</View>
 	);
 }
@@ -73,50 +126,72 @@ function ThemeToggle() {
 }
 ```
 
+```typescript
+import {useThemeSelect} from 'rn-stylish';
+
+function ThemeToggle() {
+	const {themeMode, setThemeMode} = useThemeSelect();
+
+	return (
+		<View>
+			<Button title="Light" onPress={() => setThemeMode('light')} />
+			<Button title="Dark" onPress={() => setThemeMode('dark')} />
+			<Button title="System" onPress={() => setThemeMode('system')} />
+			<Text>Current: {themeMode}</Text>
+		</View>
+	);
+}
+```
+
 ## Advanced Usage
 
 ### Custom Themes
 
-Define your own color schemes:
+Define your own color schemes. Remember:
+
+- **`themeColors`** - Change when switching between light/dark mode
+- **`staticColors`** - Stay the same regardless of theme mode (brand colors, success/error states, etc.)
 
 ```typescript
 import {useThemeSelect, Theme} from 'rn-stylish';
 import {useEffect} from 'react';
 
+// Define theme-aware colors separately
+const lightThemeColors = {
+	background: '#F5F5F5', // Light background
+	text: '#333333', // Dark text for light mode
+	linkText: '#007AFF',
+	primary: '#FF6B6B',
+	secondary: '#4ECDC4',
+};
+
+const darkThemeColors = {
+	background: '#1A1A1A', // Dark background
+	text: '#FFFFFF', // Light text for dark mode
+	linkText: '#66B2FF',
+	primary: '#FF8787',
+	secondary: '#63E6E1',
+};
+
+// Define static colors once - shared by both themes
+const staticColors = {
+	brand: '#FF6B6B', // Your brand color - same in both themes
+	white: '#FFFFFF',
+	black: '#000000',
+	success: '#51CF66', // Success green - same in both themes
+	error: '#FF6B6B', // Error red - same in both themes
+	warning: '#FFD93D',
+};
+
+// Compose the theme objects
 const myLightTheme: Theme = {
-	themeColors: {
-		background: '#F5F5F5',
-		text: '#333333',
-		linkText: '#007AFF',
-		primary: '#FF6B6B',
-		secondary: '#4ECDC4',
-	},
-	staticColors: {
-		brand: '#FF6B6B',
-		white: '#FFFFFF',
-		black: '#000000',
-		success: '#51CF66',
-		error: '#FF6B6B',
-		warning: '#FFD93D',
-	},
+	themeColors: lightThemeColors,
+	staticColors,
 };
 
 const myDarkTheme: Theme = {
-	themeColors: {
-		background: '#1A1A1A',
-		text: '#FFFFFF',
-		linkText: '#66B2FF',
-		primary: '#FF8787',
-		secondary: '#63E6E1',
-	},
-	staticColors: {
-		brand: '#FF8787',
-		white: '#FFFFFF',
-		black: '#000000',
-		success: '#69DB7C',
-		error: '#FF8787',
-		warning: '#FFE066',
-	},
+	themeColors: darkThemeColors,
+	staticColors, // Same static colors
 };
 
 function App() {
@@ -269,26 +344,27 @@ Hook for managing theme mode and custom themes.
 
 - `themeMode: 'light' | 'dark' | 'system'` - Current theme mode
 - `setThemeMode(mode: ThemeMode)` - Change theme mode
-- `setLightTheme(theme: Theme)` - Override light theme colors
-- `setDarkTheme(theme: Theme)` - Override dark theme colors
+- `setLightThemeStyles(styles: ThemeColors)` - Set light theme styles
+- `setDarkThemeStyles(styles: ThemeColors)` - Set dark theme styles
+- `setStaticStyles(styles: StaticColors)` - Set static styles (brand colors, etc.)
 
 ### Types
 
 ```typescript
 interface Theme {
-	themeColors: ThemeColors; // Colors that change with theme
-	staticColors: StaticColors; // Colors that stay the same
+	themeColors: ThemeColors; // Colors that CHANGE with light/dark mode
+	staticColors: StaticColors; // Colors that STAY THE SAME (brand, etc.)
 }
 
 interface ThemeColors {
-	background: string;
-	text: string;
+	background: string; // Changes: light bg in light mode, dark bg in dark mode
+	text: string; // Changes: dark text in light mode, light text in dark mode
 	linkText: string;
-	[key: string]: string; // Add your own colors
+	[key: string]: string; // Add your own theme-aware colors
 }
 
 interface StaticColors {
-	[key: string]: string; // Brand colors, etc.
+	[key: string]: string; // Brand colors, success/error colors - consistent across themes
 }
 
 type ThemeMode = 'light' | 'dark' | 'system';
@@ -322,23 +398,60 @@ rn-stylish comes with sensible defaults:
 ```typescript
 {
   themeColors: {
-    background: '#1C1C1E',
-    text: '#FFFFFF',
-    linkText: '#ADD8E6',
+    background: '#1C1C1E',  // Different from light
+    text: '#FFFFFF',         // Different from light
+    linkText: '#ADD8E6',     // Different from light
   },
   staticColors: {
-    // Same as light theme
+    // SAME as light theme - these don't change
+    brand: 'dodgerblue',
+    white: 'white',
+    green: '#008521',
+    red: '#FF3B30',
+    gray: '#808080',
   }
 }
 ```
 
 ## Best Practices
 
-1. **Use `themeColors` for colors that change** between light/dark modes
-2. **Use `staticColors` for brand colors** that stay consistent
-3. **Set custom themes early** in your app's lifecycle (in App.tsx or index.js)
+1. **Use `themeColors` for UI styles that should adapt** to light/dark mode (backgrounds, text, borders)
+2. **Use `staticColors` for brand identity and semantic styles** that should stay consistent (your logo color, success green, error red, warning yellow)
+3. **Set custom themes at app startup** - Call `setLightThemeStyles`, `setDarkThemeStyles`, and `setStaticStyles` in your App component's useEffect
 4. **Leverage TypeScript** - the package is fully typed for great autocomplete
-5. **Memoize expensive style calculations** - the hook already does this for you
+5. **Think beyond colors** - Theme and static styles can include any style values (fontSize, spacing, borderRadius, etc.)
+
+### Example: What goes where?
+
+```typescript
+// Theme styles - these CHANGE based on light/dark mode
+lightThemeStyles: {
+  background: '#FFFFFF',
+  text: '#000000',
+  cardBackground: '#F5F5F5',
+  border: '#E0E0E0',
+  fontSize: 16,  // Can be more than just colors!
+}
+
+darkThemeStyles: {
+  background: '#000000',
+  text: '#FFFFFF',
+  cardBackground: '#1C1C1E',
+  border: '#3A3A3C',
+  fontSize: 16,
+}
+
+// Static styles - these STAY THE SAME in both themes
+staticStyles: {
+  brand: '#FF6B6B',      // Your brand color
+  success: '#51CF66',    // Success state - always green
+  error: '#FF3B30',      // Error state - always red
+  warning: '#FFD93D',    // Warning state - always yellow
+  white: '#FFFFFF',
+  black: '#000000',
+  borderRadius: 8,       // Can be more than just colors!
+}
+```
 
 ## Example: Complete App Setup
 
@@ -347,7 +460,25 @@ rn-stylish comes with sensible defaults:
 import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native';
 import {useThemeSelect, createThemedStyles} from 'rn-stylish';
-import {myLightTheme, myDarkTheme} from './themes';
+
+// Define your theme styles
+const lightThemeStyles = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#0000EE',
+};
+
+const darkThemeStyles = {
+	background: '#1C1C1E',
+	text: '#FFFFFF',
+	linkText: '#ADD8E6',
+};
+
+const staticStyles = {
+	brand: '#FF6B6B',
+	success: '#51CF66',
+	error: '#FF3B30',
+};
 
 const useStyles = createThemedStyles(theme => ({
 	container: {
@@ -357,13 +488,15 @@ const useStyles = createThemedStyles(theme => ({
 }));
 
 function App() {
-	const {setLightTheme, setDarkTheme} = useThemeSelect();
+	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
+		useThemeSelect();
 	const {styles} = useStyles();
 
 	useEffect(() => {
 		// Set your custom themes once at app start
-		setLightTheme(myLightTheme);
-		setDarkTheme(myDarkTheme);
+		setLightThemeStyles(lightThemeStyles);
+		setDarkThemeStyles(darkThemeStyles);
+		setStaticStyles(staticStyles);
 	}, []);
 
 	return (
@@ -386,4 +519,4 @@ MIT
 
 ## Credits
 
-Built with ❤️ using [Jotai](https://jotai.org/) for state management.
+Using [Jotai](https://jotai.org/) for state management.
