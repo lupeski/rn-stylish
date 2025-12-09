@@ -7,33 +7,36 @@ import {
 } from 'react-native';
 import {useMemo} from 'react';
 import {useAtomValue} from 'jotai';
-import {Theme, ThemeStyles, StaticStyles} from './types';
 import {
 	themeModeAtom,
 	lightThemeStylesAtom,
 	darkThemeStylesAtom,
 	staticStylesAtom,
 } from './themeAtom';
+import {Theme, ThemeStyles, StaticStyles} from './types';
 
 type RNStyle = ViewStyle | TextStyle | ImageStyle;
 type NamedStyles<T> = {[P in keyof T]: RNStyle};
 
 export function createThemedStyles<
-	TThemeStyles extends ThemeStyles = ThemeStyles,
-	TStaticStyles extends StaticStyles = StaticStyles,
-	Props extends Record<string, any> = Record<string, any>,
+	TThemeStyles extends ThemeStyles,
+	TStaticStyles extends StaticStyles,
+	Props extends Record<string, any> = {},
 	Styles extends NamedStyles<Styles> = NamedStyles<any>
 >(
-	stylesFn: (theme: Theme<TThemeStyles, TStaticStyles>, props: Props) => Styles
+	stylesFn: (
+		theme: Theme<TThemeStyles, TStaticStyles, Props>,
+		props: Props
+	) => Styles
 ) {
 	return (props?: Props) => {
 		const systemScheme = useColorScheme();
 		const mode = useAtomValue(themeModeAtom);
-		const lightThemeStyles = useAtomValue(lightThemeStylesAtom);
-		const darkThemeStyles = useAtomValue(darkThemeStylesAtom);
-		const staticStyles = useAtomValue(staticStylesAtom);
+		const lightThemeStyles = useAtomValue(lightThemeStylesAtom) as TThemeStyles;
+		const darkThemeStyles = useAtomValue(darkThemeStylesAtom) as TThemeStyles;
+		const staticStyles = useAtomValue(staticStylesAtom) as TStaticStyles;
 
-		let activeThemeStyles;
+		let activeThemeStyles: TThemeStyles;
 		if (mode === 'light') {
 			activeThemeStyles = lightThemeStyles;
 		} else if (mode === 'dark') {
@@ -43,10 +46,10 @@ export function createThemedStyles<
 				systemScheme === 'dark' ? darkThemeStyles : lightThemeStyles;
 		}
 
-		// Compose the theme object
-		const activeTheme: Theme<TThemeStyles, TStaticStyles> = {
-			themeStyles: activeThemeStyles as TThemeStyles,
-			staticStyles: staticStyles as TStaticStyles,
+		const activeTheme: Theme<TThemeStyles, TStaticStyles, Props> = {
+			themeStyles: activeThemeStyles,
+			staticStyles,
+			props,
 		};
 
 		const styles = useMemo(() => {
