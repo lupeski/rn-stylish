@@ -147,8 +147,6 @@ function ThemeToggle() {
 
 If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
 
-**Set both themes to the same values**
-
 ```javascript
 const staticStyles = {
 	background: '#FFFFFF',
@@ -157,8 +155,7 @@ const staticStyles = {
 };
 
 function App() {
-	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
-		useThemeSelect();
+	const {setStaticStyles} = useThemeSelect();
 
 	useEffect(() => {
 		// Just set static styles
