@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import {useMemo} from 'react';
 import {useAtomValue} from 'jotai';
-import {Theme} from './types';
+import {Theme, ThemeStyles, StaticStyles} from './types';
 import {
 	themeModeAtom,
 	lightThemeStylesAtom,
@@ -19,9 +19,13 @@ type RNStyle = ViewStyle | TextStyle | ImageStyle;
 type NamedStyles<T> = {[P in keyof T]: RNStyle};
 
 export function createThemedStyles<
+	TThemeStyles extends ThemeStyles = ThemeStyles,
+	TStaticStyles extends StaticStyles = StaticStyles,
 	Props extends Record<string, any> = Record<string, any>,
 	Styles extends NamedStyles<Styles> = NamedStyles<any>
->(stylesFn: (theme: Theme, props: Props) => Styles) {
+>(
+	stylesFn: (theme: Theme<TThemeStyles, TStaticStyles>, props: Props) => Styles
+) {
 	return (props?: Props) => {
 		const systemScheme = useColorScheme();
 		const mode = useAtomValue(themeModeAtom);
@@ -40,9 +44,9 @@ export function createThemedStyles<
 		}
 
 		// Compose the theme object
-		const activeTheme: Theme = {
-			themeStyles: activeThemeStyles,
-			staticStyles: staticStyles,
+		const activeTheme: Theme<TThemeStyles, TStaticStyles> = {
+			themeStyles: activeThemeStyles as TThemeStyles,
+			staticStyles: staticStyles as TStaticStyles,
 		};
 
 		const styles = useMemo(() => {
