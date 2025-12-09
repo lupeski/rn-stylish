@@ -9,7 +9,7 @@ A flexible and type-safe theming system for React Native with automatic light/da
 - 🎯 **Simple API** - Easy to use hooks and utilities
 - ⚡ **Performance** - Memoized styles with efficient re-renders
 - 🎭 **Fully customizable** - Define your own theme structure and styles
-- 🔄 **Flexible styling** - Support for colors, sizes, spacing, and any style values
+- 🔄 **Flexible styling** - Support for colors, font sizes, padding, margins, and any style values
 - 📦 **Lightweight** - Minimal dependencies (just Jotai for state)
 
 ## Installation
@@ -40,7 +40,7 @@ const lightThemeStyles = {
 	border: '#DEE2E6',
 	placeholder: '#6C757D',
 	fontSize: 16,
-	spacing: 16,
+	padding: 16,
 };
 
 // Define your dark theme styles
@@ -52,7 +52,7 @@ const darkThemeStyles = {
 	border: '#343A40',
 	placeholder: '#ADB5BD',
 	fontSize: 16,
-	spacing: 16,
+	padding: 16,
 };
 
 // Define your static styles (same in both themes)
@@ -114,7 +114,7 @@ export const lightThemeStyles = {
 	border: '#DEE2E6',
 	placeholder: '#6C757D',
 	fontSize: 16,
-	spacing: 16,
+	padding: 16,
 };
 
 // Dark theme
@@ -126,7 +126,7 @@ export const darkThemeStyles = {
 	border: '#343A40',
 	placeholder: '#ADB5BD',
 	fontSize: 16,
-	spacing: 16,
+	padding: 16,
 };
 
 // Static styles
@@ -174,7 +174,7 @@ const useStyles = createThemedStyles(theme => ({
 	container: {
 		backgroundColor: theme.themeStyles.background,
 		flex: 1,
-		padding: theme.themeStyles.spacing,
+		padding: theme.themeStyles.padding,
 	},
 	text: {
 		color: theme.themeStyles.text,
@@ -232,6 +232,51 @@ function ThemeToggle() {
 }
 ```
 
+### 4. Single Theme Mode (No Light/Dark Switching)
+
+If your app doesn't need theme switching, you can use a single theme:
+
+**Option 1: Set both themes to the same values**
+
+```typescript
+const myTheme = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#007AFF',
+};
+
+function App() {
+	const {setLightThemeStyles, setDarkThemeStyles, setStaticStyles} =
+		useThemeSelect();
+
+	useEffect(() => {
+		// Use the same theme for both light and dark
+		setLightThemeStyles(myTheme);
+		setDarkThemeStyles(myTheme);
+		setStaticStyles(staticStyles);
+		// Theme mode will default to 'system', but it won't matter since both themes are the same
+	}, []);
+
+	return <YourApp />;
+}
+```
+
+**Option 2: Lock to one mode**
+
+```typescript
+function App() {
+	const {setThemeMode, setLightThemeStyles, setStaticStyles} = useThemeSelect();
+
+	useEffect(() => {
+		setLightThemeStyles(myTheme);
+		setStaticStyles(staticStyles);
+		setThemeMode('light'); // Always use light mode, ignore dark theme
+	}, []);
+
+	return <YourApp />;
+}
+```
+
 ## Advanced Usage
 
 ### Styles with Props
@@ -244,7 +289,7 @@ import {useHeaderHeight} from '@react-navigation/elements';
 const useStyles = createThemedStyles((theme, props) => ({
 	container: {
 		paddingTop: props.headerHeight + 15,
-		paddingHorizontal: theme.themeStyles.spacing,
+		paddingHorizontal: theme.themeStyles.padding,
 		gap: 15,
 		backgroundColor: theme.themeStyles.background,
 	},
@@ -405,11 +450,11 @@ See the "Configure Your Themes" section above for examples.
 
 ## Best Practices
 
-1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders, theme-specific spacing)
+1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders, padding/margins that change with theme)
 2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius, max widths)
 3. **Set custom themes at app startup** - Call `setLightThemeStyles`, `setDarkThemeStyles`, and `setStaticStyles` in your App component's useEffect
 4. **Leverage TypeScript** - Extend `ThemeStyles` and `StaticStyles` interfaces for full autocomplete
-5. **Think beyond colors** - Include fontSize, spacing, borderRadius, shadows, etc.
+5. **Think beyond colors** - Include fontSize, padding, margin, borderRadius, shadows, etc.
 
 ### Example: What goes where?
 
@@ -420,7 +465,7 @@ lightThemeStyles: {
   text: '#000000',
   cardBackground: '#F5F5F5',
   border: '#E0E0E0',
-  spacing: 16,
+  padding: 16,
   fontSize: 16,
 }
 
@@ -429,7 +474,7 @@ darkThemeStyles: {
   text: '#FFFFFF',
   cardBackground: '#1C1C1E',
   border: '#3A3A3C',
-  spacing: 16,
+  padding: 16,
   fontSize: 16,
 }
 
@@ -511,4 +556,4 @@ MIT
 
 ## Credits
 
-Using [Jotai](https://jotai.org/) for state management.
+Built with ❤️ using [Jotai](https://jotai.org/) for state management.
