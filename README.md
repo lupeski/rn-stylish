@@ -83,7 +83,7 @@ export const {createThemedStyles, useThemeControl, updateThemeConfig} =
 	});
 ```
 
-**Note for Single-Theme Mode:** In single-theme mode, access all styles from `theme.staticStyles` (not `theme.themeStyles`). Theme switching functions will have no effect.
+**Note for Single-Theme Mode:** In single-theme mode, access all styles from `theme.staticStyles` (not `theme.themeStyles`). ThemeMode switching functions will have no effect.
 
 ### Step 2: Create Themed Styles
 
@@ -211,7 +211,7 @@ function ItemList({items}) {
 }
 ```
 
-**Note - Theme Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes. This hook is returned from `configureTheme()` and must be imported from where you configured your theme, not from the rn-stylish package directly.
+**Note - ThemeMode Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes. This hook is returned from `configureTheme()` and must be imported from where you configured your theme, not from the rn-stylish package directly.
 
 ```javascript
 import {useThemeControl} from './themes';
@@ -231,7 +231,7 @@ function ThemeToggle() {
 }
 ```
 
-If using single-theme mode, theme switching has no effect.
+If using single-theme mode, theme mode switching has no effect.
 
 **Note - Accessing Theme Directly:** Sometimes you need theme values outside of styles. The `useStyles()` hook returns a `theme` object that you can use directly:
 
