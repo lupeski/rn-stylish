@@ -208,7 +208,7 @@ function ItemList({items}) {
 }
 ```
 
-**Note - Theme Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes:
+**Note - Theme Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes (This hook is returned from configureTheme() and must be imported from where you configured your theme, not from the rn-stylish package directly):
 
 ```javascript
 import {useThemeControl} from './themes';
