@@ -208,6 +208,28 @@ function ItemList({items}) {
 }
 ```
 
+**Note - Theme Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes:
+
+```javascript
+import {useThemeControl} from './themes';
+
+function ThemeToggle() {
+	const {themeMode, setThemeMode, resetThemeMode} = useThemeControl();
+
+	return (
+		<View>
+			<Button title="Light" onPress={() => setThemeMode('light')} />
+			<Button title="Dark" onPress={() => setThemeMode('dark')} />
+			<Button title="System" onPress={() => setThemeMode('system')} />
+			<Button title="Reset to Default" onPress={resetThemeMode} />
+			<Text>Current: {themeMode}</Text>
+		</View>
+	);
+}
+```
+
+If using single-theme mode, theme switching has no effect.
+
 **Note - Accessing Theme Directly:** Sometimes you need theme values outside of styles. The `useStyles()` hook returns a `theme` object that you can use directly:
 
 ```typescript
@@ -230,28 +252,6 @@ function MyComponent() {
 	);
 }
 ```
-
-**Note - Theme Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes:
-
-```javascript
-import {useThemeControl} from './themes';
-
-function ThemeToggle() {
-	const {themeMode, setThemeMode, resetThemeMode} = useThemeControl();
-
-	return (
-		<View>
-			<Button title="Light" onPress={() => setThemeMode('light')} />
-			<Button title="Dark" onPress={() => setThemeMode('dark')} />
-			<Button title="System" onPress={() => setThemeMode('system')} />
-			<Button title="Reset to Default" onPress={resetThemeMode} />
-			<Text>Current: {themeMode}</Text>
-		</View>
-	);
-}
-```
-
-If using single-theme mode, theme switching has no effect.
 
 ## Advanced Usage
 
