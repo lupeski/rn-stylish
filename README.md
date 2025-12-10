@@ -130,6 +130,7 @@ Pass dynamic values to your styles:
 
 ```javascript
 import {useHeaderHeight} from '@react-navigation/elements';
+import {createThemedStyles} from './themes';
 
 const useStyles = createThemedStyles((theme, props) => {
 	return {
@@ -165,6 +166,8 @@ Use `getDynamicStyles` when you need to compute styles inline with different val
 **NOTE**: If extracting a list item into a full react component, you can simply use the useStyles hook in that component. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
 
 ```javascript
+import {createThemedStyles} from './themes';
+
 const useStyles = createThemedStyles((theme, props) => {
 	return {
 		container: {
