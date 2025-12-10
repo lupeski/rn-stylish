@@ -9,8 +9,25 @@ export function configureTheme<
 	StaticStylesType extends Record<string, any>
 >(config: ThemeConfig<ThemeStylesType, StaticStylesType>) {
 	// Check if this is single-theme mode or dual-theme mode
-	const isSingleThemeMode =
-		!('lightThemeStyles' in config) || !('darkThemeStyles' in config);
+	const hasLightTheme = 'lightThemeStyles' in config;
+	const hasDarkTheme = 'darkThemeStyles' in config;
+
+	// Validate theme configuration
+	if (hasLightTheme && !hasDarkTheme) {
+		throw new Error(
+			'rn-stylish: lightThemeStyles provided without darkThemeStyles. ' +
+				'Either provide both for dual-theme mode, or use only staticStyles for single-theme mode.'
+		);
+	}
+
+	if (!hasLightTheme && hasDarkTheme) {
+		throw new Error(
+			'rn-stylish: darkThemeStyles provided without lightThemeStyles. ' +
+				'Either provide both for dual-theme mode, or use only staticStyles for single-theme mode.'
+		);
+	}
+
+	const isSingleThemeMode = !hasLightTheme && !hasDarkTheme;
 
 	let lightThemeStyles =
 		'lightThemeStyles' in config
