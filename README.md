@@ -1,6 +1,4 @@
-type ThemeMode = 'light' | 'dark' | 'system' | 'custom';
-
-interface Theme# rn-stylish
+# rn-stylish
 
 A flexible and type-safe theming system for React Native with automatic light/dark mode support powered by Jotai.
 
@@ -23,17 +21,18 @@ npm install rn-stylish
 
 ## Quick Start
 
-### Option 1: Dual-Theme Mode (Light/Dark Switching)
+### Step 1: Configure Your Themes
 
-#### 1. Configure Your Themes
+Choose the setup that fits your needs:
 
-rn-stylish requires you to define your own theme styles. Set them up in your app's entry point before using any themed components.
+#### Option A: Dual-Theme Mode (Light/Dark Switching)
 
-#### Setup
-
-Create a `themes.ts` or `themes.js` file to define your themes:
+Create a `themes.ts` or `themes.js` file:
 
 ```javascript
+// themes.js
+import {configureTheme} from 'rn-stylish';
+
 export const lightThemeStyles = {
 	background: '#FFFFFF',
 	text: '#000000',
@@ -51,34 +50,43 @@ export const staticStyles = {
 	success: '#008521',
 	error: '#FF3B30',
 };
-```
-
-Then in your App:
-
-```javascript
-// App.tsx / App.js or wherever your app's entry point is
-import {configureTheme} from 'rn-stylish';
-import {lightThemeStyles, darkThemeStyles, staticStyles} from './themes';
 
 export const {createThemedStyles, useThemeControl} = configureTheme({
 	lightThemeStyles,
 	darkThemeStyles,
 	staticStyles,
-	initialMode: 'system',
+	initialMode: 'system', // optional: 'light' | 'dark' | 'system' (default: 'system')
 });
-
-function App() {
-	return <YourApp />;
-}
 ```
 
-Now when you use themes, you'll get autocomplete for all your custom properties.
+#### Option B: Single-Theme Mode
 
-#### 2. Create Themed Styles
+If you don't need light/dark switching:
+
+```javascript
+// themes.js
+import {configureTheme} from 'rn-stylish';
+
+const staticStyles = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#007AFF',
+	brand: 'dodgerblue',
+	success: '#008521',
+};
+
+export const {createThemedStyles, useThemeControl} = configureTheme({
+	staticStyles,
+});
+```
+
+**Note for Single-Theme Mode:** In single-theme mode, access all styles from `theme.staticStyles` (not `theme.themeStyles`). Theme switching functions will have no effect.
+
+### Step 2: Create Themed Styles
 
 ```javascript
 import {View, Text} from 'react-native';
-import {createThemedStyles} from './App.js';
+import {createThemedStyles} from './themes';
 
 const useStyles = createThemedStyles((theme, props) => {
 	return {
@@ -109,10 +117,10 @@ function MyComponent() {
 }
 ```
 
-#### 3. Theme Switching
+### Step 3: Theme Switching (Dual-Theme Mode Only)
 
 ```javascript
-import {useThemeControl} from './themes'; // Import from where you configured your theme
+import {useThemeControl} from './themes';
 
 function ThemeToggle() {
 	const {themeMode, setThemeMode, resetThemeMode} = useThemeControl();
@@ -129,7 +137,52 @@ function ThemeToggle() {
 }
 ```
 
-### 4. Custom Themes (Dynamic Theme Creation)
+**Note:** If using single-theme mode, skip this step as theme switching has no effect.
+
+### Option 2: Single-Theme Mode
+
+If your app doesn't need light/dark theme switching, configure with just `staticStyles`:
+
+```javascript
+// themes.js
+import {configureTheme} from 'rn-stylish';
+
+const staticStyles = {
+	background: '#FFFFFF',
+	text: '#000000',
+	linkText: '#007AFF',
+	brand: 'dodgerblue',
+	success: '#008521',
+};
+
+export const {createThemedStyles, useThemeControl} = configureTheme({
+	staticStyles,
+});
+```
+
+In single-theme mode, access all styles from `theme.staticStyles`:
+
+```javascript
+const useStyles = createThemedStyles(theme => ({
+	container: {
+		backgroundColor: theme.staticStyles.background,
+		flex: 1,
+	},
+	text: {
+		color: theme.staticStyles.text,
+	},
+	brandText: {
+		color: theme.staticStyles.brand,
+		fontWeight: 'bold',
+	},
+}));
+```
+
+**Note:** Theme switching functions like `setThemeMode` will have no effect in single-theme mode.
+
+## Advanced Usage
+
+### Custom Themes (Dynamic Theme Creation)
 
 Allow users to create and apply their own custom themes at runtime:
 
@@ -169,8 +222,6 @@ function CustomThemeCreator() {
 Custom themes automatically switch the mode to `'custom'` and apply immediately throughout your app. They follow the same structure as your `lightThemeStyles` and `darkThemeStyles`.
 
 **Persistence:** Custom themes are automatically saved to AsyncStorage and will persist across app restarts. When the user reopens the app with mode set to 'custom', their custom theme will be restored automatically.
-
-## Advanced Usage
 
 ### Styles with Props
 
@@ -337,52 +388,10 @@ Hook for managing theme mode. Theme preference is automatically persisted to sto
 - `resetThemeMode()` - Reset theme mode back to the `initialMode` specified in `configureTheme()`
 - `setCustomThemeStyles(customStyles: ThemeStylesType)` - Apply a custom theme dynamically. Automatically switches mode to 'custom'
 
-## Single Theme Mode (No Light/Dark Switching)
-
-This section has moved! See "Alternative: Single Theme Mode" near the top of the documentation.
-
-## Types
-
-If your app doesn't need theme switching, simply omit light and dark themes, and just use staticStyles:
-
-```javascript
-import {configureTheme} from 'rn-stylish';
-
-const staticStyles = {
-	background: '#FFFFFF',
-	text: '#000000',
-	linkText: '#007AFF',
-	brand: 'dodgerblue',
-	success: '#008521',
-};
-
-export const {createThemedStyles, useThemeControl} = configureTheme({
-	staticStyles,
-});
-
-function App() {
-	return <YourApp />;
-}
-```
-
-In single-theme mode, access styles directly from `theme.staticStyles`:
-
-```javascript
-const useStyles = createThemedStyles(theme => ({
-	container: {
-		backgroundColor: theme.staticStyles.background,
-		flex: 1,
-	},
-	text: {
-		color: theme.staticStyles.text,
-	},
-}));
-```
-
 ## Types
 
 ```typescript
-type ThemeMode = 'light' | 'dark' | 'system';
+type ThemeMode = 'light' | 'dark' | 'system' | 'custom';
 
 interface Theme<
 	ThemeStylesType extends Record<string, any> = Record<string, any>,
@@ -392,15 +401,22 @@ interface Theme<
 	staticStyles: StaticStylesType;
 }
 
-interface ThemeConfig<
+type ThemeConfig<
 	ThemeStylesType extends Record<string, any> = Record<string, any>,
 	StaticStylesType extends Record<string, any> = Record<string, any>
-> {
-	lightThemeStyles: ThemeStylesType;
-	darkThemeStyles: ThemeStylesType;
-	staticStyles: StaticStylesType;
-	initialMode?: ThemeMode;
-}
+> =
+	| {
+			// Dual-theme mode (light/dark switching)
+			lightThemeStyles: ThemeStylesType;
+			darkThemeStyles: ThemeStylesType;
+			staticStyles: StaticStylesType;
+			initialMode?: 'light' | 'dark' | 'system';
+	  }
+	| {
+			// Single-theme mode (no light/dark switching)
+			staticStyles: StaticStylesType;
+			initialMode?: never;
+	  };
 
 interface ThemedStylesHook<
 	Styles,
@@ -427,7 +443,7 @@ See the "Configure Your Themes" section above for examples.
 
 1. **Use `themeStyles` for values that should adapt** to light/dark mode (backgrounds, text colors, borders)
 2. **Use `staticStyles` for brand identity and constants** that should stay consistent (your logo color, success green, error red, border radius)
-3. **Set custom themes at app startup** - Call `configureTheme` once in your app's entry point
+3. **Set custom themes at app startup** - Call `configureTheme` once in your themes file
 4. **Think beyond colors** - Include fontSize, padding, margin, borderRadius, shadows, etc.
 5. **Theme preferences persist automatically** - User's theme choice is saved and restored on app restart
 
@@ -459,61 +475,6 @@ staticStyles: {
   maxWidth: 1200,
   headerHeight: 60,
 }
-```
-
-## Example: Complete App Setup
-
-```typescript
-// themes.ts
-export const lightThemeStyles = {
-	background: '#FFFFFF',
-	text: '#000000',
-	cardBackground: '#F5F5F5',
-};
-
-export const darkThemeStyles = {
-	background: '#1C1C1E',
-	text: '#FFFFFF',
-	cardBackground: '#2C2C2E',
-};
-
-export const staticStyles = {
-	brand: 'dodgerblue',
-	success: '#008521',
-	error: '#FF3B30',
-};
-
-// App.tsx
-import React from 'react';
-import {SafeAreaView} from 'react-native';
-import {configureTheme} from 'rn-stylish';
-import {lightThemeStyles, darkThemeStyles, staticStyles} from './themes';
-
-export const {createThemedStyles, useThemeControl} = configureTheme({
-	lightThemeStyles,
-	darkThemeStyles,
-	staticStyles,
-	initialMode: 'system',
-});
-
-const useStyles = createThemedStyles(theme => ({
-	container: {
-		flex: 1,
-		backgroundColor: theme.themeStyles.background,
-	},
-}));
-
-function App() {
-	const {styles} = useStyles();
-
-	return (
-		<SafeAreaView style={styles.container}>
-			{/* Your app content */}
-		</SafeAreaView>
-	);
-}
-
-export default App;
 ```
 
 ## Contributing
