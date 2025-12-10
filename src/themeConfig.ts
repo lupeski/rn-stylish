@@ -1,7 +1,7 @@
 import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
-import {useAtom, useAtomValue, atom} from 'jotai';
+import {useAtom, useAtomValue, atom, useSetAtom} from 'jotai';
 import {createThemeModeAtom} from './themeAtom';
 
 export function configureTheme<
@@ -27,7 +27,11 @@ export function configureTheme<
 	const themeModeAtom = createThemeModeAtom(initialMode || 'system');
 
 	// Counter atom to trigger re-renders when themes are updated
+	// This needs to be a writable atom so we can update it properly
 	const themeVersionAtom = atom(0);
+
+	// Store the setter function so updateThemeConfig can use it
+	let incrementThemeVersion: (() => void) | null = null;
 
 	// Function to update theme configuration dynamically
 	function updateThemeConfig(
@@ -43,8 +47,10 @@ export function configureTheme<
 			staticStyles = newConfig.staticStyles;
 		}
 
-		// Increment version to trigger re-renders in all components using themed styles
-		themeVersionAtom.init = (themeVersionAtom.init || 0) + 1;
+		// Trigger re-renders by incrementing the version
+		if (incrementThemeVersion) {
+			incrementThemeVersion();
+		}
 	}
 
 	// Create useThemeControl hook
@@ -74,6 +80,12 @@ export function configureTheme<
 			const systemScheme = useColorScheme();
 			const mode = useAtomValue(themeModeAtom);
 			const themeVersion = useAtomValue(themeVersionAtom); // Subscribe to theme updates
+			const setThemeVersion = useSetAtom(themeVersionAtom);
+
+			// Set up the increment function on first render
+			if (!incrementThemeVersion) {
+				incrementThemeVersion = () => setThemeVersion(prev => prev + 1);
+			}
 
 			// Build the full theme object with both themeStyles and staticStyles
 			let activeTheme: Theme<ThemeStylesType, StaticStylesType>;
