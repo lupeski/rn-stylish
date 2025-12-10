@@ -1,4 +1,3 @@
-````typescript
 type ThemeMode = 'light' | 'dark' | 'system' | 'custom';
 
 interface Theme# rn-stylish
@@ -20,7 +19,7 @@ A flexible and type-safe theming system for React Native with automatic light/da
 
 ```bash
 npm install rn-stylish
-````
+```
 
 ## Quick Start
 
