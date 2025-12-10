@@ -83,7 +83,7 @@ export const {createThemedStyles, useThemeControl, updateThemeConfig} =
 	});
 ```
 
-**Note for Single-Theme Mode:** In single-theme mode, access all styles from `theme.staticStyles` (not `theme.themeStyles`). ThemeMode switching functions will have no effect.
+**Note - Single-Theme Mode:** In single-theme mode, access all styles from `theme.staticStyles` (not `theme.themeStyles`). ThemeMode switching functions will have no effect.
 
 ### Step 2: Create Themed Styles
 
@@ -163,7 +163,7 @@ function EmailValidation() {
 
 Use `getDynamicStyles` when you need to compute styles inline with different values (like in lists):
 
-**NOTE**: If extracting a list item into a full react component, you can simply use the useStyles hook in that component. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
+**Note:** If extracting a list item into a full react component, you can simply use the useStyles hook in that component. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
 
 ```javascript
 import {createThemedStyles} from './themes';
