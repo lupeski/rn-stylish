@@ -89,6 +89,8 @@ export const {createThemedStyles, useThemeControl, updateThemeConfig} =
 
 #### Basic Usage
 
+**Note: `createThemedStyles` is returned from configureTheme() and must be imported from where you configured your theme, not from the rn-stylish package directly.**
+
 ```javascript
 import {View, Text} from 'react-native';
 import {createThemedStyles} from './themes';
@@ -261,6 +263,8 @@ function MyComponent() {
 ### Dynamic Theme Updates
 
 Load and apply custom themes at runtime (perfect for user-customizable themes or loading from remote config):
+
+**Note: `updateThemeConfig` is returned from configureTheme() and must be imported from where you configured your theme, not from the rn-stylish package directly.**
 
 ```javascript
 // App.js
