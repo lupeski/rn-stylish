@@ -84,6 +84,8 @@ export const {createThemedStyles, useThemeControl} = configureTheme({
 
 ### Step 2: Create Themed Styles
 
+#### Basic Usage
+
 ```javascript
 import {View, Text} from 'react-native';
 import {createThemedStyles} from './themes';
@@ -117,29 +119,7 @@ function MyComponent() {
 }
 ```
 
-### Step 3: Theme Switching (Dual-Theme Mode Only)
-
-```javascript
-import {useThemeControl} from './themes';
-
-function ThemeToggle() {
-	const {themeMode, setThemeMode, resetThemeMode} = useThemeControl();
-
-	return (
-		<View>
-			<Button title="Light" onPress={() => setThemeMode('light')} />
-			<Button title="Dark" onPress={() => setThemeMode('dark')} />
-			<Button title="System" onPress={() => setThemeMode('system')} />
-			<Button title="Reset to Default" onPress={resetThemeMode} />
-			<Text>Current: {themeMode}</Text>
-		</View>
-	);
-}
-```
-
-**Note:** If using single-theme mode, skip this step as theme switching has no effect.
-
-## Styles with Props
+#### Styles with Props
 
 Pass dynamic values to your styles:
 
@@ -173,7 +153,7 @@ function EmailValidation() {
 }
 ```
 
-## Dynamic Styles with `getDynamicStyles`
+#### Dynamic Styles with `getDynamicStyles`
 
 Use `getDynamicStyles` when you need to compute styles inline with different values (like in lists):
 
@@ -228,19 +208,9 @@ function ItemList({items}) {
 }
 ```
 
-## Accessing Theme Directly
-
-Sometimes you need theme values outside of styles:
+**Note - Accessing Theme Directly:** Sometimes you need theme values outside of styles. The `useStyles()` hook returns a `theme` object that you can use directly:
 
 ```typescript
-const useStyles = createThemedStyles((theme, props) => {
-	return {
-		container: {
-			backgroundColor: theme.themeStyles.background,
-		},
-	};
-});
-
 function MyComponent() {
 	const {styles, theme} = useStyles();
 
@@ -260,6 +230,28 @@ function MyComponent() {
 	);
 }
 ```
+
+**Note - Theme Switching (Dual-Theme Mode Only):** Use the `useThemeControl` hook to allow users to switch between light, dark, and system themes:
+
+```javascript
+import {useThemeControl} from './themes';
+
+function ThemeToggle() {
+	const {themeMode, setThemeMode, resetThemeMode} = useThemeControl();
+
+	return (
+		<View>
+			<Button title="Light" onPress={() => setThemeMode('light')} />
+			<Button title="Dark" onPress={() => setThemeMode('dark')} />
+			<Button title="System" onPress={() => setThemeMode('system')} />
+			<Button title="Reset to Default" onPress={resetThemeMode} />
+			<Text>Current: {themeMode}</Text>
+		</View>
+	);
+}
+```
+
+If using single-theme mode, theme switching has no effect.
 
 ## Advanced Usage
 
@@ -303,128 +295,6 @@ function CustomThemeCreator() {
 Custom themes automatically switch the mode to `'custom'` and apply immediately throughout your app. They follow the same structure as your `lightThemeStyles` and `darkThemeStyles`.
 
 **Persistence:** Custom themes are automatically saved to AsyncStorage and will persist across app restarts. When the user reopens the app with mode set to 'custom', their custom theme will be restored automatically.
-
-### Styles with Props
-
-Pass dynamic values to your styles:
-
-```javascript
-import {useHeaderHeight} from '@react-navigation/elements';
-
-const useStyles = createThemedStyles((theme, props) => {
-	return {
-		container: {
-			paddingTop: props.headerHeight + 15,
-			paddingHorizontal: 16,
-			gap: 15,
-			backgroundColor: theme.themeStyles.background,
-		},
-		title: {
-			color: theme.themeStyles.text,
-			fontSize: 24,
-		},
-	};
-});
-
-function EmailValidation() {
-	const headerHeight = useHeaderHeight();
-	const {styles} = useStyles({headerHeight});
-
-	return (
-		<View style={styles.container}>
-			<Text style={styles.title}>Enter Email</Text>
-		</View>
-	);
-}
-```
-
-### Dynamic Styles with `getDynamicStyles`
-
-Use `getDynamicStyles` when you need to compute styles inline with different values (like in lists):
-
-**NOTE**: If extracting a list item into a full react component, you can simply use the useStyles hook in that component. The getDynamicStyles helper function is just for generating the style inline, if the list item is rendered inline.
-
-```javascript
-const useStyles = createThemedStyles((theme, props) => {
-	return {
-		container: {
-			flex: 1,
-			backgroundColor: theme.themeStyles.background,
-			justifyContent: 'center',
-			gap: 12,
-		},
-		item: {
-			padding: 16,
-			borderRadius: 8,
-			backgroundColor: props.isSelected
-				? theme.staticStyles.success
-				: theme.themeStyles.cardBackground,
-		},
-		itemText: {
-			color: props.isSelected ? '#FFFFFF' : theme.themeStyles.text,
-		},
-	};
-});
-
-function ItemList({items}) {
-	const {styles, getDynamicStyles} = useStyles();
-	const [selectedIndex, setSelectedIndex] = useState(0);
-
-	return (
-		<SafeAreaView style={styles.container}>
-			{items.map((item, index) => {
-				// Generate styles dynamically for each item
-				const dynamicStyle = getDynamicStyles({
-					isSelected: index === selectedIndex,
-				});
-
-				return (
-					<TouchableOpacity
-						key={index}
-						style={dynamicStyle.item}
-						onPress={() => setSelectedIndex(index)}
-					>
-						<Text style={dynamicStyle.itemText}>{item.name}</Text>
-					</TouchableOpacity>
-				);
-			})}
-		</SafeAreaView>
-	);
-}
-```
-
-### Accessing Theme Directly
-
-Sometimes you need theme values outside of styles:
-
-```typescript
-const useStyles = createThemedStyles((theme, props) => {
-	return {
-		container: {
-			backgroundColor: theme.themeStyles.background,
-		},
-	};
-});
-
-function MyComponent() {
-	const {styles, theme} = useStyles();
-
-	// Use theme values directly
-	const statusBarStyle =
-		theme.themeStyles.background === '#FFFFFF'
-			? 'dark-content'
-			: 'light-content';
-
-	return (
-		<>
-			<StatusBar barStyle={statusBarStyle} />
-			<View style={styles.container}>
-				<Text>Content</Text>
-			</View>
-		</>
-	);
-}
-```
 
 ## API Reference
 
