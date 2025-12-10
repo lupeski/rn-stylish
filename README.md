@@ -139,47 +139,6 @@ function ThemeToggle() {
 
 **Note:** If using single-theme mode, skip this step as theme switching has no effect.
 
-### Option 2: Single-Theme Mode
-
-If your app doesn't need light/dark theme switching, configure with just `staticStyles`:
-
-```javascript
-// themes.js
-import {configureTheme} from 'rn-stylish';
-
-const staticStyles = {
-	background: '#FFFFFF',
-	text: '#000000',
-	linkText: '#007AFF',
-	brand: 'dodgerblue',
-	success: '#008521',
-};
-
-export const {createThemedStyles, useThemeControl} = configureTheme({
-	staticStyles,
-});
-```
-
-In single-theme mode, access all styles from `theme.staticStyles`:
-
-```javascript
-const useStyles = createThemedStyles(theme => ({
-	container: {
-		backgroundColor: theme.staticStyles.background,
-		flex: 1,
-	},
-	text: {
-		color: theme.staticStyles.text,
-	},
-	brandText: {
-		color: theme.staticStyles.brand,
-		fontWeight: 'bold',
-	},
-}));
-```
-
-**Note:** Theme switching functions like `setThemeMode` will have no effect in single-theme mode.
-
 ## Advanced Usage
 
 ### Custom Themes (Dynamic Theme Creation)
