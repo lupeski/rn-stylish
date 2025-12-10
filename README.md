@@ -77,9 +77,10 @@ const staticStyles = {
 	success: '#008521',
 };
 
-export const {createThemedStyles, useThemeControl} = configureTheme({
-	staticStyles,
-});
+export const {createThemedStyles, useThemeControl, updateThemeConfig} =
+	configureTheme({
+		staticStyles,
+	});
 ```
 
 **Note for Single-Theme Mode:** In single-theme mode, access all styles from `theme.staticStyles` (not `theme.themeStyles`). Theme switching functions will have no effect.
