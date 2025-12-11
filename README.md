@@ -372,6 +372,7 @@ Dynamically updates theme configuration at runtime. All components using themed 
 ```javascript
 updateThemeConfig({
 	lightThemeStyles: {background: '#F0F0F0', text: '#333333'},
+	darkThemeStyles: {background: '#000000', text: '#F0F0F0'},
 	staticStyles: {brand: '#FF6B6B'},
 });
 ```
