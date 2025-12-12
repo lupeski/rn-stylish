@@ -1,7 +1,7 @@
 import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
-import {useAtom, useAtomValue, atom} from 'jotai';
+import {useAtom, useAtomValue, atom, createStore} from 'jotai';
 import {createThemeModeAtom} from './themeAtom';
 
 export function configureTheme<
@@ -46,7 +46,8 @@ export function configureTheme<
 	// Counter atom to trigger re-renders when themes are updated
 	const themeVersionAtom = atom(0);
 
-	// REMOVED: const store = createStore();
+	// Create a Jotai store instance for this theme configuration
+	const store = createStore();
 
 	// Function to update theme configuration dynamically
 	function updateThemeConfig(
@@ -62,14 +63,14 @@ export function configureTheme<
 			staticStyles = newConfig.staticStyles;
 		}
 
-		// COMMENTED OUT - testing without store
-		// const currentVersion = store.get(themeVersionAtom);
-		// store.set(themeVersionAtom, currentVersion + 1);
+		// Trigger re-renders by incrementing the version using the store
+		const currentVersion = store.get(themeVersionAtom);
+		store.set(themeVersionAtom, currentVersion + 1);
 	}
 
 	// Create useThemeControl hook
 	function useThemeControl() {
-		const [themeMode, setThemeMode] = useAtom(themeModeAtom); // REMOVED {store}
+		const [themeMode, setThemeMode] = useAtom(themeModeAtom, {store});
 
 		const resetThemeMode = () => {
 			setThemeMode(initialMode || 'system');
@@ -92,8 +93,10 @@ export function configureTheme<
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
-			const mode = useAtomValue(themeModeAtom); // REMOVED {store}
-			const themeVersion = useAtomValue(themeVersionAtom); // REMOVED {store}
+			// const mode = useAtomValue(themeModeAtom, {store});
+			// const themeVersion = useAtomValue(themeVersionAtom, {store});
+			const mode = 'system'; // HARDCODED
+			const themeVersion = 0; // HARDCODED
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
