@@ -126,7 +126,13 @@ export function configureTheme<
 				return StyleSheet.create(stylesFn(activeTheme, dynamicProps));
 			};
 
-			return {styles, getDynamicStyles, theme: activeTheme};
+			// return {styles, getDynamicStyles, theme: activeTheme};
+
+			const returnValue = useMemo(() => {
+				return {styles, getDynamicStyles, theme: activeTheme};
+			}, [styles, activeTheme]);
+
+			return returnValue;
 		};
 	}
 
