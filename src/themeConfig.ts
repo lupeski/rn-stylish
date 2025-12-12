@@ -70,7 +70,7 @@ export function configureTheme<
 
 	// Create useThemeControl hook
 	function useThemeControl() {
-		const [themeMode, setThemeMode] = useAtom(themeModeAtom, {store});
+		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
 
 		const resetThemeMode = () => {
 			setThemeMode(initialMode || 'system');
@@ -93,7 +93,7 @@ export function configureTheme<
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
-			const mode = useAtomValue(themeModeAtom, {store});
+			const mode = useAtomValue(themeModeAtom);
 			// const themeVersion = useAtomValue(themeVersionAtom, {store});
 			const themeVersion = 0;
 
