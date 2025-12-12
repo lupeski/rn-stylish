@@ -41,7 +41,8 @@ export function configureTheme<
 	const initialMode = 'initialMode' in config ? config.initialMode : 'system';
 
 	// Create the theme atom with the specified initial mode
-	const themeModeAtom = atom('system');
+	// const themeModeAtom = atom('system');
+	const themeModeAtom = createThemeModeAtom(initialMode || 'system');
 
 	// Counter atom to trigger re-renders when themes are updated
 	const themeVersionAtom = atom(0);
