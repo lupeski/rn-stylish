@@ -95,7 +95,7 @@ export function configureTheme<
 			const systemScheme = useColorScheme();
 			// const mode = useAtomValue(themeModeAtom);
 			let mode = 'system';
-			const themeVersion = useAtomValue(themeVersionAtom);
+			const themeVersion = useAtomValue(themeVersionAtom, {store});
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
