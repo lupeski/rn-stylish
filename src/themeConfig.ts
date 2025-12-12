@@ -94,34 +94,32 @@ export function configureTheme<
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
 			const mode = useAtomValue(themeModeAtom);
-			const themeVersion = useAtomValue(themeVersionAtom, {store}); // Subscribe to theme updates via store
+			const themeVersion = useAtomValue(themeVersionAtom, {store});
 
-			// Build the full theme object with both themeStyles and staticStyles
-			let activeTheme: Theme<ThemeStylesType, StaticStylesType>;
-
-			if (isSingleThemeMode) {
-				// Single-theme mode: themeStyles is empty, everything is in staticStyles
-				activeTheme = {
-					themeStyles: {} as ThemeStylesType,
-					staticStyles,
-				};
-			} else {
-				// Dual-theme mode: switch between light/dark
-				if (mode === 'light') {
-					activeTheme = {themeStyles: lightThemeStyles, staticStyles};
-				} else if (mode === 'dark') {
-					activeTheme = {themeStyles: darkThemeStyles, staticStyles};
+			// Memoize activeTheme to prevent unnecessary re-renders
+			const activeTheme = useMemo(() => {
+				if (isSingleThemeMode) {
+					return {
+						themeStyles: {} as ThemeStylesType,
+						staticStyles,
+					};
 				} else {
-					const themeStyles =
-						systemScheme === 'dark' ? darkThemeStyles : lightThemeStyles;
-					activeTheme = {themeStyles, staticStyles};
+					if (mode === 'light') {
+						return {themeStyles: lightThemeStyles, staticStyles};
+					} else if (mode === 'dark') {
+						return {themeStyles: darkThemeStyles, staticStyles};
+					} else {
+						const themeStyles =
+							systemScheme === 'dark' ? darkThemeStyles : lightThemeStyles;
+						return {themeStyles, staticStyles};
+					}
 				}
-			}
+			}, [mode, systemScheme, themeVersion]);
 
 			// Base styles (with optional props)
 			const styles = useMemo(() => {
 				return StyleSheet.create(stylesFn(activeTheme, (props ?? {}) as Props));
-			}, [activeTheme, props, themeVersion]); // Re-compute when theme version changes
+			}, [activeTheme, props]);
 
 			// Helper for generating styles dynamically
 			const getDynamicStyles = (dynamicProps: Props) => {
