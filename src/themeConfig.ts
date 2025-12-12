@@ -1,7 +1,7 @@
 import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
-import {useAtom, useAtomValue, atom, createStore} from 'jotai';
+import {useAtom, useAtomValue, atom} from 'jotai';
 import {createThemeModeAtom} from './themeAtom';
 
 export function configureTheme<
@@ -41,14 +41,12 @@ export function configureTheme<
 	const initialMode = 'initialMode' in config ? config.initialMode : 'system';
 
 	// Create the theme atom with the specified initial mode
-	// const themeModeAtom = createThemeModeAtom(initialMode || 'system');
 	const themeModeAtom = atom('system');
 
 	// Counter atom to trigger re-renders when themes are updated
 	const themeVersionAtom = atom(0);
 
-	// Create a Jotai store instance for this theme configuration
-	const store = createStore();
+	// REMOVED: const store = createStore();
 
 	// Function to update theme configuration dynamically
 	function updateThemeConfig(
@@ -64,14 +62,14 @@ export function configureTheme<
 			staticStyles = newConfig.staticStyles;
 		}
 
-		// Trigger re-renders by incrementing the version using the store
-		const currentVersion = store.get(themeVersionAtom);
-		store.set(themeVersionAtom, currentVersion + 1);
+		// COMMENTED OUT - testing without store
+		// const currentVersion = store.get(themeVersionAtom);
+		// store.set(themeVersionAtom, currentVersion + 1);
 	}
 
 	// Create useThemeControl hook
 	function useThemeControl() {
-		const [themeMode, setThemeMode] = useAtom(themeModeAtom, {store});
+		const [themeMode, setThemeMode] = useAtom(themeModeAtom); // REMOVED {store}
 
 		const resetThemeMode = () => {
 			setThemeMode(initialMode || 'system');
@@ -94,8 +92,8 @@ export function configureTheme<
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
-			const mode = useAtomValue(themeModeAtom, {store});
-			const themeVersion = useAtomValue(themeVersionAtom, {store});
+			const mode = useAtomValue(themeModeAtom); // REMOVED {store}
+			const themeVersion = useAtomValue(themeVersionAtom); // REMOVED {store}
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
