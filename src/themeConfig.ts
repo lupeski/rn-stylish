@@ -43,7 +43,6 @@ export function configureTheme<
 	// Create the theme atom with the specified initial mode
 	// const themeModeAtom = createThemeModeAtom(initialMode || 'system');
 	const themeModeAtom = atom('system');
-	console.log('HEY');
 
 	// Counter atom to trigger re-renders when themes are updated
 	const themeVersionAtom = atom(0);
@@ -95,7 +94,7 @@ export function configureTheme<
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
-			const mode = useAtomValue(themeModeAtom);
+			const mode = useAtomValue(themeModeAtom, {store});
 			const themeVersion = useAtomValue(themeVersionAtom, {store});
 
 			// Memoize activeTheme to prevent unnecessary re-renders
