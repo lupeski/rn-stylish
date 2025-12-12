@@ -49,9 +49,6 @@ export function configureTheme<
 	// Create a Jotai store instance for this theme configuration
 	const store = createStore();
 
-	// Create store option object once to avoid recreating on every render
-	const storeOption = {store};
-
 	// Function to update theme configuration dynamically
 	function updateThemeConfig(
 		newConfig: Partial<ThemeConfig<ThemeStylesType, StaticStylesType>>
@@ -73,7 +70,7 @@ export function configureTheme<
 
 	// Create useThemeControl hook
 	function useThemeControl() {
-		const [themeMode, setThemeMode] = useAtom(themeModeAtom, storeOption);
+		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
 
 		const resetThemeMode = () => {
 			setThemeMode(initialMode || 'system');
@@ -96,8 +93,8 @@ export function configureTheme<
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
-			const mode = useAtomValue(themeModeAtom, storeOption);
-			const themeVersion = useAtomValue(themeVersionAtom, storeOption);
+			const mode = useAtomValue(themeModeAtom);
+			const themeVersion = useAtomValue(themeVersionAtom, {store});
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {

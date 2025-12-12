@@ -11,10 +11,6 @@ let cachedAtom: any = null;
 // Function to create the theme atom with a custom initial value
 // This ensures we only create one atom instance, even if called multiple times
 export function createThemeModeAtom(initialMode: ThemeMode = 'system') {
-	if (!cachedAtom) {
-		// atomWithStorage will use initialMode only on first launch
-		// On subsequent launches, it loads from AsyncStorage
-		cachedAtom = atomWithStorage<ThemeMode>('themeMode', initialMode, storage);
-	}
-	return cachedAtom;
+	// Remove the cachedAtom check - create fresh each time
+	return atomWithStorage<ThemeMode>('themeMode', initialMode, storage);
 }
