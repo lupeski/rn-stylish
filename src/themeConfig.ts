@@ -3,7 +3,6 @@ import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
 import {useAtom, useAtomValue, atom, createStore} from 'jotai';
 import {createThemeModeAtom} from './themeAtom';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function configureTheme<
 	ThemeStylesType extends Record<string, any>,
@@ -50,20 +49,6 @@ export function configureTheme<
 	// Create a Jotai store instance for this theme configuration
 	const store = createStore();
 
-	// Eagerly hydrate the atom from storage on library initialization
-	// This prevents the double render when components mount later
-	(async () => {
-		const storedValue = await AsyncStorage.getItem('themeMode');
-		if (storedValue) {
-			try {
-				const parsed = JSON.parse(storedValue);
-				store.set(themeModeAtom, parsed);
-			} catch (e) {
-				// Ignore parse errors, use default
-			}
-		}
-	})();
-
 	// Function to update theme configuration dynamically
 	function updateThemeConfig(
 		newConfig: Partial<ThemeConfig<ThemeStylesType, StaticStylesType>>
@@ -107,12 +92,20 @@ export function configureTheme<
 		return (
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
+			console.log('=== Hook start ===');
+
 			const systemScheme = useColorScheme();
+			console.log('After useColorScheme:', systemScheme);
+
 			const mode = useAtomValue(themeModeAtom);
+			console.log('After useAtomValue:', mode);
+
 			const themeVersion = useAtomValue(themeVersionAtom, {store});
+			console.log('After themeVersion:', themeVersion);
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
+				console.log('activeTheme useMemo running');
 				if (isSingleThemeMode) {
 					return {
 						themeStyles: {} as ThemeStylesType,
