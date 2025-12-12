@@ -104,7 +104,8 @@ export function configureTheme<
 			const mode = useAtomValue(themeModeAtom);
 			console.log('2. mode:', mode);
 
-			const themeVersion = useAtomValue(themeVersionAtom);
+			// const themeVersion = useAtomValue(themeVersionAtom, {store});
+			const themeVersion = 0;
 			console.log('3. themeVersion:', themeVersion);
 
 			// Memoize activeTheme to prevent unnecessary re-renders
