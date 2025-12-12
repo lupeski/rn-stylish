@@ -2,7 +2,7 @@ import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
 import {useAtom, useAtomValue, atom, createStore} from 'jotai';
-import {createThemeModeAtom} from './themeAtom';
+import {createThemeModeAtom, ThemeMode} from './themeAtom';
 
 export function configureTheme<
 	ThemeStylesType extends Record<string, any>,
@@ -41,7 +41,8 @@ export function configureTheme<
 	const initialMode = 'initialMode' in config ? config.initialMode : 'system';
 
 	// Create the theme atom with the specified initial mode
-	const themeModeAtom = createThemeModeAtom(initialMode || 'system');
+	// const themeModeAtom = createThemeModeAtom(initialMode || 'system');
+	const themeModeAtom = atom<ThemeMode>(initialMode || 'system');
 
 	// Counter atom to trigger re-renders when themes are updated
 	const themeVersionAtom = atom(0);
@@ -92,20 +93,12 @@ export function configureTheme<
 		return (
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
-			console.log('=== Hook start ===');
-
 			const systemScheme = useColorScheme();
-			console.log('After useColorScheme:', systemScheme);
-
 			const mode = useAtomValue(themeModeAtom);
-			console.log('After useAtomValue:', mode);
-
 			const themeVersion = useAtomValue(themeVersionAtom, {store});
-			console.log('After themeVersion:', themeVersion);
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
-				console.log('activeTheme useMemo running');
 				if (isSingleThemeMode) {
 					return {
 						themeStyles: {} as ThemeStylesType,
