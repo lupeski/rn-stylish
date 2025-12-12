@@ -101,7 +101,8 @@ export function configureTheme<
 			const systemScheme = useColorScheme();
 			console.log('1. systemScheme:', systemScheme);
 
-			const mode = useAtomValue(themeModeAtom);
+			// const mode = useAtomValue(themeModeAtom);
+			const mode = 'system';
 			console.log('2. mode:', mode);
 
 			// const themeVersion = useAtomValue(themeVersionAtom, {store});
