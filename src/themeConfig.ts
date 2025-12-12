@@ -94,8 +94,7 @@ export function configureTheme<
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
 			const systemScheme = useColorScheme();
 			const mode = useAtomValue(themeModeAtom);
-			// const themeVersion = useAtomValue(themeVersionAtom, {store});
-			const themeVersion = 0;
+			const themeVersion = useAtomValue(themeVersionAtom);
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
