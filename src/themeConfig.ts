@@ -92,9 +92,20 @@ export function configureTheme<
 		return (
 			props?: Props
 		): ThemedStylesHook<Styles, ThemeStylesType, StaticStylesType> => {
+			// const systemScheme = useColorScheme();
+			// const mode = useAtomValue(themeModeAtom);
+			// const themeVersion = useAtomValue(themeVersionAtom, {store});
+
+			console.log('=== Hook render start ===');
+
 			const systemScheme = useColorScheme();
+			console.log('1. systemScheme:', systemScheme);
+
 			const mode = useAtomValue(themeModeAtom);
+			console.log('2. mode:', mode);
+
 			const themeVersion = useAtomValue(themeVersionAtom, {store});
+			console.log('3. themeVersion:', themeVersion);
 
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
@@ -126,13 +137,7 @@ export function configureTheme<
 				return StyleSheet.create(stylesFn(activeTheme, dynamicProps));
 			};
 
-			// return {styles, getDynamicStyles, theme: activeTheme};
-
-			const returnValue = useMemo(() => {
-				return {styles, getDynamicStyles, theme: activeTheme};
-			}, [styles, activeTheme]);
-
-			return returnValue;
+			return {styles, getDynamicStyles, theme: activeTheme};
 		};
 	}
 
