@@ -1,6 +1,6 @@
 {
 	"name": "rn-stylish",
-	"version": "1.1.20",
+	"version": "1.1.21",
 	"description": "A flexible theming system for React Native with light/dark mode support",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
