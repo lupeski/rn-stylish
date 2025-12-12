@@ -71,7 +71,7 @@ export function configureTheme<
 
 	// Create useThemeControl hook
 	function useThemeControl() {
-		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
+		const [themeMode, setThemeMode] = useAtom(themeModeAtom, {store});
 
 		const resetThemeMode = () => {
 			setThemeMode(initialMode || 'system');
