@@ -96,6 +96,8 @@ export function configureTheme<
 			const mode = useAtomValue(themeModeAtom);
 			const themeVersion = useAtomValue(themeVersionAtom, {store});
 
+			console.log('Hook called:', {systemScheme, mode, themeVersion});
+
 			// Memoize activeTheme to prevent unnecessary re-renders
 			const activeTheme = useMemo(() => {
 				if (isSingleThemeMode) {
