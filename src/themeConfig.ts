@@ -73,11 +73,18 @@ export function configureTheme<
 	function useThemeControl() {
 		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
 
+		const systemScheme = useColorScheme();
+
+		let themeStyle = themeMode;
+		if (themeMode === 'system') {
+			themeStyle = systemScheme;
+		}
+
 		const resetThemeMode = () => {
 			setThemeMode(initialMode || 'system');
 		};
 
-		return {themeMode, setThemeMode, resetThemeMode};
+		return {themeMode, setThemeMode, resetThemeMode, themeStyle};
 	}
 
 	// Create the themed styles function with the configured themes

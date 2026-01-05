@@ -1,4 +1,5 @@
 import {ViewStyle, TextStyle, ImageStyle} from 'react-native';
+import {ThemeMode} from './themeAtom';
 
 // One big type that covers all RN style props
 export type RNStyle = ViewStyle | TextStyle | ImageStyle;
@@ -42,4 +43,18 @@ export interface ThemedStylesHook<
 	styles: Styles;
 	getDynamicStyles: (dynamicProps: any) => Styles;
 	theme: Theme<ThemeStylesType, StaticStylesType>;
+}
+
+// ThemeMode type export
+export type {ThemeMode} from './themeAtom';
+
+// ThemeStyle type export
+export type ThemeStyle = 'light' | 'dark' | null;
+
+// useThemeControl types
+export interface UseThemeControlReturn {
+	themeMode: ThemeMode;
+	setThemeMode: (mode: ThemeMode) => void;
+	resetThemeMode: () => void;
+	themeStyle: ThemeStyle;
 }
