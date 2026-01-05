@@ -1,8 +1,14 @@
-import {Theme, ThemeConfig, NamedStyles, ThemedStylesHook} from './types';
+import {
+	Theme,
+	ThemeConfig,
+	NamedStyles,
+	ThemedStylesHook,
+	ThemeStyle,
+} from './types';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMemo} from 'react';
 import {useAtom, useAtomValue, atom, createStore} from 'jotai';
-import {createThemeModeAtom} from './themeAtom';
+import {createThemeModeAtom, ThemeMode} from './themeAtom';
 
 export function configureTheme<
 	ThemeStylesType extends Record<string, any>,
@@ -71,13 +77,15 @@ export function configureTheme<
 
 	// Create useThemeControl hook
 	function useThemeControl() {
-		const [themeMode, setThemeMode] = useAtom(themeModeAtom);
+		const [themeMode, setThemeMode] = useAtom<ThemeMode>(themeModeAtom);
 
 		const systemScheme = useColorScheme();
 
-		let themeStyle = themeMode;
+		let themeStyle: ThemeStyle;
 		if (themeMode === 'system') {
-			themeStyle = systemScheme;
+			themeStyle = systemScheme ?? null;
+		} else {
+			themeStyle = themeMode;
 		}
 
 		const resetThemeMode = () => {
